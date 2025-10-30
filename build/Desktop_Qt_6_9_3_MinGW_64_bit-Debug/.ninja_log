@@ -1,0 +1,24 @@
+# ninja log v6
+793	3802	7835177564010477	CMakeFiles/laba3.dir/laba3_autogen/mocs_compilation.cpp.obj	b9713e247e8a7d49
+42	210	7835184057073516	laba3_autogen/timestamp	e2bf744731516abf
+42	210	7835184057073516	laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+42	210	7835184057073516	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/timestamp	e2bf744731516abf
+42	210	7835184057073516	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+796	3664	7835177564050501	CMakeFiles/laba3.dir/main.cpp.obj	5fea89383398fbf7
+212	272	7835074658396557	CMakeFiles/laba3.dir/shape.cpp.obj	7919f39f7dcb7d23
+211	3053	7835184058761943	CMakeFiles/laba3.dir/mainwindow.cpp.obj	6788fe09f1843e4
+3053	3287	7835184087192134	laba3.exe	3eada54bf3e98120
+202	2157	7835088004969882	CMakeFiles/laba3.dir/shapestorage.cpp.obj	a293c66c58a8f1ac
+227	3174	7835183109379489	CMakeFiles/laba3.dir/paintwidget.cpp.obj	5c3f7d3535626f5f
+38	228	7835184891600021	laba3_autogen/timestamp	e2bf744731516abf
+38	228	7835184891600021	laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+38	228	7835184891600021	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/timestamp	e2bf744731516abf
+38	228	7835184891600021	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+229	2699	7835184893511075	CMakeFiles/laba3.dir/mainwindow.cpp.obj	6788fe09f1843e4
+2699	2943	7835184918213083	laba3.exe	3eada54bf3e98120
+46	207	7835185103040486	laba3_autogen/timestamp	e2bf744731516abf
+46	207	7835185103040486	laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+46	207	7835185103040486	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/timestamp	e2bf744731516abf
+46	207	7835185103040486	C:/Users/bcali/Desktop/OOP/laba3/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/laba3_autogen/mocs_compilation.cpp	e2bf744731516abf
+208	3029	7835185104666470	CMakeFiles/laba3.dir/mainwindow.cpp.obj	6788fe09f1843e4
+3029	3263	7835185132875318	laba3.exe	3eada54bf3e98120
