@@ -3,8 +3,6 @@ using namespace std;
 int s = 0;
 PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 {
-    connect(this, &MainWindow::keypressed, PaintWidget, &PaintWidget::keyPressEvent);
-    //connect(this, &MainWindow::keypressed, paintWidget, &PaintWidget::keyPressEvent);
 }
 
 void PaintWidget::paintEvent(QPaintEvent *event)
@@ -12,12 +10,8 @@ void PaintWidget::paintEvent(QPaintEvent *event)
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    // Заливаем всю доступную область виджета цветом
-    //painter.setBrush(backgroundRole());
-    //painter.fillRect(this->rect(), backgroundRole());
     storage.drawAll(painter);
     painter->end();
-    qDebug() << this->size();
 }
 
 void PaintWidget::resizeEvent(QResizeEvent *event)
@@ -40,10 +34,9 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
 
 void PaintWidget::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << event->key();
     if (event->key() == Qt::Key_Delete)
     {
-        qDebug() << "asd";
         storage.removeSelectedShapes();
+        update();
     }
 }

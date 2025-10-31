@@ -39,10 +39,16 @@ bool ShapeStorage::selectShape(int iX, int iY, bool unSelectOther)
 
 void ShapeStorage::removeSelectedShapes()
 {
-    for (Shape *shape : storage)
+    for (auto it = storage.begin(); it != storage.end();)
     {
+        Shape* shape = *it;
         if (shape->getSelect())
+        {
             delete shape;
+            it = storage.erase(it);
+        }
+        else
+            ++it;
     }
 }
 

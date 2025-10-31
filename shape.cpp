@@ -26,14 +26,15 @@ bool Circle::isClicked(int iX, int iY)
 
 void Circle::draw(QPainter *painter)
 {
-    qDebug() << (selected ? Qt::blue : Qt::NoPen);
-    // painter->setPen(selected ? Qt::blue : Qt::NoPen);
-    if (selected)
-        painter->setPen(Qt::blue);
-    else
-        painter->setPen(Qt::NoPen);
+    painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::NoPen));
     painter->setBrush(Qt::green);
     painter->drawEllipse(QPoint(x, y), radius, radius);
+    if (selected)
+    {
+        painter->setPen(QPen(Qt::white, 1, Qt::DashLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(x - radius, y - radius, radius*2, radius*2);
+    }
 }
 
 void Circle::select()
