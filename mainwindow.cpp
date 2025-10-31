@@ -10,9 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ShapeStorage storage = ShapeStorage();
-    PaintWidget *paintContainer = new PaintWidget(ui->paintContainer); // paintContainer - это ваш виджет из UI
-    //paintContainer->setGeometry(ui->paintContainer->geometry());  // Устанавливаем его размер и положение
-    //paintContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -24,4 +21,9 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    emit keypressed();
 }

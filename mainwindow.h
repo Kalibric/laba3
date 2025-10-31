@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include <QResizeEvent>
+#include <QKeyEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,5 +23,9 @@ public:
 private:
     Ui::MainWindow *ui;
     void resizeEvent(QResizeEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+
+signals:
+    void keypressed();
 };
 #endif // MAINWINDOW_H

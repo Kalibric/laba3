@@ -9,9 +9,14 @@ class ShapeStorage
 {
 public:
     ShapeStorage();
+    void add(Shape *iShape);
+    void drawAll(QPainter *painter);
+    bool selectShape(int iX, int iY, bool unSelectOther = false);
+    void removeShape(Shape *iShape);
+    void removeSelectedShapes();
 
 private:
-    vector<Shape> storage;
+    vector<Shape*> storage;
 };
 
 #endif // SHAPESTORAGE_H
