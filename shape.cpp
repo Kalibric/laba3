@@ -37,12 +37,18 @@ void Circle::draw(QPainter *painter)
     }
 }
 
-void Circle::select()
+void Shape::select()
 {
     selected = true;
 }
 
-void Circle::unSelect()
+void Shape::unSelect()
 {
     selected = false;
+}
+
+void Shape::changeRelativeCoord(int iX, int iY)
+{
+    x += iX;
+    y += iY;
 }

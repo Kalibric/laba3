@@ -8,9 +8,10 @@ public:
     Shape();
     virtual bool isClicked(int iX, int iY) { return false; };
     virtual void draw(QPainter *painter) {};
-    virtual void select() {};
-    virtual void unSelect() {};
-    bool getSelect() {return selected;}
+    virtual void select();
+    virtual void unSelect();
+    virtual bool isSelect() {return selected;}
+    virtual void changeRelativeCoord(int iX, int iY);
 protected:
     int x = 0;
     int y = 0;
@@ -24,8 +25,6 @@ public:
     Circle(int iX, int iY, int iRadius = 50);
     bool isClicked(int iX, int iY) override;
     void draw(QPainter *painter) override;
-    void select() override;
-    void unSelect() override;
 protected:
     int radius = 50;
 };

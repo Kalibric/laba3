@@ -10,10 +10,15 @@ class ShapeStorage
 public:
     ShapeStorage();
     void add(Shape *iShape);
-    void drawAll(QPainter *painter);
-    bool selectShape(int iX, int iY, bool unSelectOther = false);
-    void removeShape(Shape *iShape);
+    void drawAllShapes(QPainter *painter);
+    bool selectShapeToCoord(int iX, int iY);
+    bool unSelectShapeToCoord(int iX, int iY);
+    void unselectAll();
     void removeSelectedShapes();
+    void moveSelectedShapesRelative(int iX, int iY);
+    bool isExistsSelectedToCoors(int iX, int iY);
+    bool isExistsSelectedShapes();
+    bool isExistsShapeToCoors(int iX, int iY);
 
 private:
     vector<Shape*> storage;

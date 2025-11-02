@@ -6,8 +6,8 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QMoveEvent>
 #include "shapestorage.h"
-#include "mainwindow.h"
 
 class PaintWidget : public QWidget
 {
@@ -18,11 +18,15 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
 private:
     ShapeStorage storage;
-
+    QPoint lastPosition;
+    QPoint lastPositionBefore;
+    bool isSelectEvent = false;
 
 };
 
