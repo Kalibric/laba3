@@ -27,6 +27,8 @@ private:
     QPoint lastPosition;
     QPoint lastPositionBefore;
     bool isSelectEvent = false;
+    bool isResizeEvent = false;
+    bool isMoveEvent = false;
 
 };
 

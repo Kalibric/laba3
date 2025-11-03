@@ -7,6 +7,7 @@ ShapeStorage::ShapeStorage()
 
 void ShapeStorage::add(Shape *iShape)
 {
+    iShape->changeCanvasSize(canvasSizeX, canvasSizeY);
     storage.push_back(iShape);
 }
 
@@ -65,6 +66,14 @@ bool ShapeStorage::unSelectShapeToCoord(int iX, int iY)
     return result;
 }
 
+void ShapeStorage::selectAll()
+{
+    for (Shape *shape : storage)
+    {
+        shape->select();
+    }
+}
+
 void ShapeStorage::unselectAll()
 {
     for (Shape *shape : storage)
@@ -107,7 +116,7 @@ bool ShapeStorage::isExistsSelectedShapes()
     return false;
 }
 
-bool ShapeStorage::isExistsSelectedToCoors(int iX, int iY)
+bool ShapeStorage::isExistsSelectedToCoord(int iX, int iY)
 {
     for (Shape *shape : storage)
     {
@@ -117,11 +126,38 @@ bool ShapeStorage::isExistsSelectedToCoors(int iX, int iY)
     return false;
 }
 
-bool ShapeStorage::isExistsShapeToCoors(int iX, int iY)
+bool ShapeStorage::isExistsShapeToCoord(int iX, int iY)
 {
     for (Shape *shape : storage)
     {
         if (shape->isClicked(iX, iY))
+            return true;
+    }
+    return false;
+}
+
+void ShapeStorage::changeCanvasSize(int iX, int iY)
+{
+    canvasSizeX = iX;
+    canvasSizeY = iY;
+    for (Shape *shape : storage)
+        shape->changeCanvasSize(iX, iY);
+}
+
+void ShapeStorage::resizeSelectedShapesRelative(int iSize)
+{
+    for (Shape *shape : storage)
+    {
+        if (shape->isSelect())
+            shape->relativeResize(iSize);
+    }
+}
+
+bool ShapeStorage::isResizeAreaShapeSelectedToCoord(int iX, int iY)
+{
+    for (Shape *shape : storage)
+    {
+        if (shape->isSelect() && shape->isResizeArea(iX, iY))
             return true;
     }
     return false;

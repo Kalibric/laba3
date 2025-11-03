@@ -3,6 +3,8 @@ using namespace std;
 int s = 0;
 PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 {
+    storage.changeCanvasSize(this->size().width(), this->size().height());
+    setMouseTracking(true);
 }
 
 void PaintWidget::paintEvent(QPaintEvent *event)
@@ -16,32 +18,36 @@ void PaintWidget::paintEvent(QPaintEvent *event)
 
 void PaintWidget::resizeEvent(QResizeEvent *event)
 {
+    storage.changeCanvasSize(size().width(), size().height());
     QWidget::resizeEvent(event);
 }
 
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    // 1. Если нажат КТРЛ и нажат на не выделенную фигуру - Добавить фигуру в список выделенных
-    // 2. Если нажат КТРЛ и нажат на выделенную фигуру - Убрать фигуру в список выделенных
-    // 3. Если не нажат КТРЛ и нажат на не выделенную фигуру - Выделить фигуру, убрать выделение всех остальных
-    // 4. Если не нажат КТРЛ и нажат на выделенную фигуру - Убрать выделение всех фигур
     int x = event->pos().x(), y = event->pos().y();
     if (event->button() == Qt::LeftButton)
     {
+        isResizeEvent = false;
+        isMoveEvent = false;
+        setCursor(Qt::ArrowCursor);
         if (lastPosition == lastPositionBefore)
         {
             bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
             if (!isSelectEvent)
             {
-                qDebug() << "s-1";
-                Shape *shape = new Circle(event->pos().x(), event->pos().y());
-                storage.add(shape);
-                update();
-            }
-            else if (!ctrlPressed)
-            {
-                qDebug() << "s-2";
-                storage.unSelectShapeToCoord(x, y);
+                if (storage.isExistsSelectedToCoord(x, y))
+                {
+                    if (ctrlPressed)
+                        storage.unSelectShapeToCoord(x, y);
+                    else
+                        storage.unselectAll();
+                }
+                else
+                {
+                    storage.unselectAll();
+                    Shape *shape = new Circle(event->pos().x(), event->pos().y());
+                    storage.add(shape);
+                }
                 update();
             }
         }
@@ -55,28 +61,31 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
-        if (ctrlPressed)
+        if (storage.isExistsShapeToCoord(x, y) && !storage.isExistsSelectedToCoord(x, y))
         {
-            if (storage.isExistsShapeToCoors(x, y))
-            {
-                qDebug() << "s-3";
-                if (!storage.isExistsSelectedToCoors(x, y))
-                    isSelectEvent = storage.selectShapeToCoord(x, y);
-            }
+            if (!ctrlPressed)
+                storage.unselectAll();
+            isSelectEvent = storage.selectShapeToCoord(x, y);
         }
-        else
-        {
-            if (storage.isExistsShapeToCoors(x, y))
-            {
-                if (!storage.isExistsSelectedToCoors(x, y))
-                {
-                    qDebug() << "s-4";
-                    storage.unselectAll();
-                    isSelectEvent = storage.selectShapeToCoord(x, y);
-                }
-            }
-
-        }
+        // if (ctrlPressed)
+        // {
+        //     if (storage.isExistsShapeToCoors(x, y))
+        //     {
+        //         if (!storage.isExistsSelectedToCoors(x, y))
+        //             isSelectEvent = storage.selectShapeToCoord(x, y);
+        //     }
+        // }
+        // else
+        // {
+        //     if (storage.isExistsShapeToCoors(x, y))
+        //     {
+        //         if (!storage.isExistsSelectedToCoors(x, y))
+        //         {
+        //             storage.unselectAll();
+        //             isSelectEvent = storage.selectShapeToCoord(x, y);
+        //         }
+        //     }
+        // }
 
 
         lastPositionBefore = event->pos();
@@ -89,17 +98,61 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (storage.isExistsSelectedShapes())
     {
-        storage.moveSelectedShapesRelative(event->pos().x() - lastPosition.x(), event->pos().y() - lastPosition.y());
-        lastPosition = event->pos();
+        bool isResizeArea = storage.isResizeAreaShapeSelectedToCoord(event->pos().x(), event->pos().y());
+        if (!isResizeEvent && !isMoveEvent)
+        {
+            if (isResizeArea)
+                setCursor(Qt::SizeFDiagCursor);
+            else
+                setCursor(Qt::ArrowCursor);
+        }
+        if (event->buttons() & Qt::LeftButton)
+        {
+            int dx = event->pos().x() - lastPosition.x();
+            int dy = event->pos().y() - lastPosition.y();
+            if (isResizeArea || isResizeEvent)
+            {
+                if (!isResizeEvent)
+                    setCursor(Qt::SizeFDiagCursor);
+                isResizeEvent = true;
+                storage.resizeSelectedShapesRelative((dx + dy) / 2);
+            }
+            else
+            {
+                if (!isMoveEvent)
+                    setCursor(Qt::ClosedHandCursor);
+                isMoveEvent = true;
+                storage.moveSelectedShapesRelative(dx, dy);
+            }
+            lastPosition = event->pos();
+        }
         update();
     }
+
 }
 
 void PaintWidget::keyPressEvent(QKeyEvent *event)
 {
+    bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
+    //bool shiftPressed
     if (event->key() == Qt::Key_Delete)
     {
         storage.removeSelectedShapes();
+        update();
+    }
+    else if (event->key() == Qt::Key_A && ctrlPressed)
+    {
+        storage.selectAll();
+        update();
+    }
+    else if (event->key() == Qt::Key_Equal)
+    {
+        storage.resizeSelectedShapesRelative(5);
+        update();
+    }
+    else if (event->key() == Qt::Key_Minus)
+    {
+        storage.resizeSelectedShapesRelative(-5);
         update();
     }
 }

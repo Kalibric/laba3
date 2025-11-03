@@ -12,16 +12,22 @@ public:
     void add(Shape *iShape);
     void drawAllShapes(QPainter *painter);
     bool selectShapeToCoord(int iX, int iY);
+    void selectAll();
     bool unSelectShapeToCoord(int iX, int iY);
     void unselectAll();
     void removeSelectedShapes();
     void moveSelectedShapesRelative(int iX, int iY);
-    bool isExistsSelectedToCoors(int iX, int iY);
+    void resizeSelectedShapesRelative(int iSize);
+    bool isExistsSelectedToCoord(int iX, int iY);
     bool isExistsSelectedShapes();
-    bool isExistsShapeToCoors(int iX, int iY);
+    bool isExistsShapeToCoord(int iX, int iY);
+    void changeCanvasSize(int x, int y);
+    bool isResizeAreaShapeSelectedToCoord(int iX, int iY);
 
 private:
     vector<Shape*> storage;
+    int canvasSizeX = 0;
+    int canvasSizeY = 0;
 };
 
 #endif // SHAPESTORAGE_H
