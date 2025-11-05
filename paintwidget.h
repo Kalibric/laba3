@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QMoveEvent>
+#include <QWheelEvent>
 #include "shapestorage.h"
 
 class PaintWidget : public QWidget
@@ -14,6 +15,7 @@ class PaintWidget : public QWidget
 public:
     PaintWidget(QWidget *parent = nullptr);
     void keyPressEvent(QKeyEvent *event) override;
+    void changeSelectedShape(QString iSelectedShape);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -21,6 +23,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
     ShapeStorage storage;
@@ -29,6 +32,7 @@ private:
     bool isSelectEvent = false;
     bool isResizeEvent = false;
     bool isMoveEvent = false;
+    QString selectedShape;
 
 };
 

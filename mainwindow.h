@@ -21,5 +21,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void keyPressEvent(QKeyEvent *event) override;
+    void shapeSelector(int index);
+
 };
 #endif // MAINWINDOW_H

@@ -1,5 +1,5 @@
 #include "shape.h"
-
+const QString ShapeTypes::CIRCLE = "Circle";
 Shape::Shape()
 {
 
@@ -10,6 +10,30 @@ void Shape::changeCanvasSize(int iX, int iY)
     canvasSizeX = iX;
     canvasSizeY = iY;
     changeRelativeCoord(0, 0);
+}
+
+void Shape::select()
+{
+    selected = true;
+}
+
+void Shape::unSelect()
+{
+    selected = false;
+}
+
+bool Shape::isSelect()
+{
+    return selected;
+}
+
+void Shape::changeRelativeCoord(int iX, int iY)
+{
+    qDebug() << "s";
+    if ((x + iX) > 0)
+        x += iX;
+    if ((y + iX) > 0)
+        y += iY;
 }
 
 Circle::Circle()
@@ -53,8 +77,36 @@ bool Circle::isResizeArea(int iX, int iY)
            iY >= y + radius - 10 && iY <= y + radius;
 }
 
+bool Circle::validateCoord(int iX, int iY)
+{
+    bool success = true;
+    if ((iX + radius) > canvasSizeX)
+    {
+        x = canvasSizeX - radius;
+        success = false;
+    }
+    else if ((iX - radius) < 0)
+    {
+        x = radius;
+        success = false;
+    }
+
+    if ((iY + radius) > canvasSizeY)
+    {
+        y = canvasSizeY - radius;
+        success = false;
+    }
+    else if ((iY - radius) < 0)
+    {
+        y = radius;
+        success = false;
+    }
+    return success;
+}
+
 void Circle::changeRelativeCoord(int iX, int iY)
 {
+    bool validate = validateCoord(x + iX, y + iY);
     if ((x + iX + radius) > canvasSizeX)
         x = canvasSizeX - radius;
     else if ((x + iX - radius) < 0)
@@ -81,21 +133,26 @@ void Circle::relativeResize(int iSize)
     changeRelativeCoord(0, 0);
 }
 
-void Shape::select()
+Square::Square()
 {
-    selected = true;
+
 }
 
-void Shape::unSelect()
+Square::Square(int iX, int iY, int iLength)
 {
-    selected = false;
+    x = iX;
+    y = iY;
+    lenght = iLength;
 }
 
-void Shape::changeRelativeCoord(int iX, int iY)
+bool Square::isClicked(int iX, int iY)
 {
-    qDebug() << "s";
-    if ((x + iX) > 0)
-        x += iX;
-    if ((y + iX) > 0)
-        y += iY;
+    return (x - lenght) >= iX && (x + lenght) <= iX && (y - lenght) >= iY && (y + lenght) <= iY;
+}
+
+void Square::draw(QPainter *painter)
+{
+    painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::NoPen));
+    painter->setBrush(Qt::green);
+    painter->drawRect(x - lenght, y - lenght, lenght, lenght);
 }

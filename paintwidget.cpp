@@ -22,6 +22,15 @@ void PaintWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
+void PaintWidget::wheelEvent(QWheelEvent *event)
+{
+    if (storage.isExistsSelectedShapes())
+    {
+        storage.resizeSelectedShapesRelative(event->angleDelta().y() > 0 ? 5 : -5);
+        update();
+    }
+}
+
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     int x = event->pos().x(), y = event->pos().y();
@@ -45,7 +54,11 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 else
                 {
                     storage.unselectAll();
-                    Shape *shape = new Circle(event->pos().x(), event->pos().y());
+                    Shape *shape;
+                    if (selectedShape == ShapeTypes::CIRCLE)
+                        shape = new Circle(x, y);
+                    else if (selectedShape == ShapeTypes::SQUARE)
+                        shape = new Square(x, y);
                     storage.add(shape);
                 }
                 update();
@@ -67,26 +80,6 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
                 storage.unselectAll();
             isSelectEvent = storage.selectShapeToCoord(x, y);
         }
-        // if (ctrlPressed)
-        // {
-        //     if (storage.isExistsShapeToCoors(x, y))
-        //     {
-        //         if (!storage.isExistsSelectedToCoors(x, y))
-        //             isSelectEvent = storage.selectShapeToCoord(x, y);
-        //     }
-        // }
-        // else
-        // {
-        //     if (storage.isExistsShapeToCoors(x, y))
-        //     {
-        //         if (!storage.isExistsSelectedToCoors(x, y))
-        //         {
-        //             storage.unselectAll();
-        //             isSelectEvent = storage.selectShapeToCoord(x, y);
-        //         }
-        //     }
-        // }
-
 
         lastPositionBefore = event->pos();
         lastPosition = event->pos();
@@ -134,8 +127,7 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
 void PaintWidget::keyPressEvent(QKeyEvent *event)
 {
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
-    //bool shiftPressed
-    if (event->key() == Qt::Key_Delete)
+        if (event->key() == Qt::Key_Delete)
     {
         storage.removeSelectedShapes();
         update();
@@ -155,4 +147,9 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
         storage.resizeSelectedShapesRelative(-5);
         update();
     }
+}
+
+void PaintWidget::changeSelectedShape(QString iSelectedShape)
+{
+    selectedShape = iSelectedShape;
 }
