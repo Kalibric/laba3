@@ -19,25 +19,6 @@ void ShapeStorage::drawAllShapes(QPainter *painter)
     }
 }
 
-// bool ShapeStorage::selectShapeToCoord(int iX, int iY, bool unSelectOther)
-// {
-//     bool result = false;
-//     for (Shape *shape : storage)
-//     {
-//         if (shape->isClicked(iX, iY))
-//         {
-//             if (shape->isSelect())
-//                 shape->unSelect();
-//             else
-//                 shape->select();
-//             result = true;
-//         }
-//         else if (!unSelectOther)
-//             shape->unSelect();
-//     }
-//     return result;
-// }
-
 bool ShapeStorage::selectShapeToCoord(int iX, int iY)
 {
     bool result = false;
@@ -161,4 +142,13 @@ bool ShapeStorage::isResizeAreaShapeSelectedToCoord(int iX, int iY)
             return true;
     }
     return false;
+}
+
+void ShapeStorage::changeColorSelectedShapes(QColor color)
+{
+    for (Shape *shape : storage)
+    {
+        if (shape->isSelect())
+            shape->setColor(color);
+    }
 }

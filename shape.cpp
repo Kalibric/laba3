@@ -1,5 +1,7 @@
 #include "shape.h"
 const QString ShapeTypes::CIRCLE = "Circle";
+const QString ShapeTypes::SQUARE = "Square";
+const QString ShapeTypes::TRIANGLE = "Triangle";
 Shape::Shape()
 {
 
@@ -27,13 +29,23 @@ bool Shape::isSelect()
     return selected;
 }
 
+bool Shape::validateCoord(int iX, int iY)
+{
+    return (iX > 0) && (iX < canvasSizeX) && (iY > 0) && (iY < canvasSizeY);
+}
+
 void Shape::changeRelativeCoord(int iX, int iY)
 {
-    qDebug() << "s";
-    if ((x + iX) > 0)
+    bool validate = validateCoord(x + iX, y + iY);
+    if (validate)
+    {
         x += iX;
-    if ((y + iX) > 0)
         y += iY;
+    }
+}
+void Shape::setColor(QColor iColor)
+{
+    color = iColor;
 }
 
 Circle::Circle()
@@ -41,11 +53,12 @@ Circle::Circle()
 
 }
 
-Circle::Circle(int iX, int iY, int iRadius)
+Circle::Circle(int iX, int iY, QColor iColor, int iRadius)
 {
     x = iX;
     y = iY;
     radius = iRadius;
+    color = iColor;
 }
 
 bool Circle::isClicked(int iX, int iY)
@@ -58,7 +71,7 @@ bool Circle::isClicked(int iX, int iY)
 void Circle::draw(QPainter *painter)
 {
     painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::NoPen));
-    painter->setBrush(Qt::green);
+    painter->setBrush(color);
     painter->drawEllipse(QPoint(x, y), radius, radius);
     if (selected)
     {
@@ -73,7 +86,7 @@ void Circle::draw(QPainter *painter)
 
 bool Circle::isResizeArea(int iX, int iY)
 {
-    return iX >= x + radius - 10 && iY <= x + radius &&
+    return iX >= x + radius - 10 && iX <= x + radius &&
            iY >= y + radius - 10 && iY <= y + radius;
 }
 
@@ -104,24 +117,6 @@ bool Circle::validateCoord(int iX, int iY)
     return success;
 }
 
-void Circle::changeRelativeCoord(int iX, int iY)
-{
-    bool validate = validateCoord(x + iX, y + iY);
-    if ((x + iX + radius) > canvasSizeX)
-        x = canvasSizeX - radius;
-    else if ((x + iX - radius) < 0)
-        x = radius;
-    else
-        x += iX;
-
-    if ((y + iY + radius) > canvasSizeY)
-        y = canvasSizeY - radius;
-    else if ((y + iY - radius) < 0)
-        y = radius;
-    else
-        y += iY;
-}
-
 void Circle::relativeResize(int iSize)
 {
     if (radius + iSize < 5)
@@ -130,7 +125,7 @@ void Circle::relativeResize(int iSize)
         radius = 150;
     else
         radius += iSize;
-    changeRelativeCoord(0, 0);
+    validateCoord(x, y);
 }
 
 Square::Square()
@@ -138,21 +133,151 @@ Square::Square()
 
 }
 
-Square::Square(int iX, int iY, int iLength)
+Square::Square(int iX, int iY, QColor iColor, int iLength)
 {
     x = iX;
     y = iY;
     lenght = iLength;
+    color = iColor;
 }
 
 bool Square::isClicked(int iX, int iY)
 {
-    return (x - lenght) >= iX && (x + lenght) <= iX && (y - lenght) >= iY && (y + lenght) <= iY;
+    return (iX >= x - lenght && iX <= x + lenght &&
+            iY >= y - lenght && iY <= y + lenght);
 }
 
 void Square::draw(QPainter *painter)
 {
-    painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::NoPen));
-    painter->setBrush(Qt::green);
-    painter->drawRect(x - lenght, y - lenght, lenght, lenght);
+    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::NoPen));
+    painter->setBrush(color);
+    painter->drawRect(x-lenght, y-lenght, lenght*2, lenght*2);
+    if (selected)
+    {
+        painter->setBrush(Qt::gray);
+        painter->setPen(QPen(Qt::white, 1));
+        painter->drawRect(x+lenght-10, y+lenght-10, 10, 10);
+    }
+}
+
+void Square::relativeResize(int iSize)
+{
+    if (lenght + iSize < 5)
+        lenght = 5;
+    else if (lenght + iSize > 150)
+        lenght = 150;
+    else
+        lenght += iSize;
+    validateCoord(x, y);
+}
+
+bool Square::validateCoord(int iX, int iY)
+{
+    bool success = true;
+    if ((iX + lenght) > canvasSizeX)
+    {
+        x = canvasSizeX - lenght;
+        success = false;
+    }
+    else if ((iX - lenght) < 0)
+    {
+        x = lenght;
+        success = false;
+    }
+
+    if ((iY + lenght) > canvasSizeY)
+    {
+        y = canvasSizeY - lenght;
+        success = false;
+    }
+    else if ((iY - lenght) < 0)
+    {
+        y = lenght;
+        success = false;
+    }
+    qDebug() << success;
+    return success;
+}
+
+bool Square::isResizeArea(int iX, int iY)
+{
+    return iX >= x + lenght - 10 && iX <= x + lenght &&
+           iY >= y + lenght - 10 && iY <= y + lenght;
+}
+
+Triangle::Triangle(int iX, int iY, QColor iColor, int iH)
+{
+    x = iX;
+    y = iY;
+    h = iH;
+    color = iColor;
+}
+
+bool Triangle::isClicked(int iX, int iY)
+{
+    QPolygon triangle;
+    triangle << QPoint(x, y - h) << QPoint(x - h, y + h) << QPoint(x + h, y + h);
+    return triangle.containsPoint(QPoint(iX, iY), Qt::OddEvenFill);
+}
+
+void Triangle::draw(QPainter *painter)
+{
+    QPolygon triangle;
+    triangle << QPoint(x, y - h) << QPoint(x - h, y + h) << QPoint(x + h, y + h);
+    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::NoPen));
+    painter->setBrush(color);
+    painter->drawPolygon(triangle);
+    if (selected)
+    {
+        painter->setPen(QPen(Qt::white, 1, Qt::DashLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(x - h, y - h, h*2, h*2);
+        painter->setBrush(Qt::gray);
+        painter->setPen(Qt::NoPen);
+        painter->drawRect(x+h-10, y+h-10, 10, 10);
+    }
+}
+
+void Triangle::relativeResize(int iH)
+{
+    if (h + iH < 10)
+        h = 10;
+    else if (h + iH > 150)
+        h = 150;
+    else
+        h += iH;
+    validateCoord(x, y);
+}
+
+bool Triangle::validateCoord(int iX, int iY)
+{
+    bool success = true;
+    if ((iX + h) > canvasSizeX)
+    {
+        x = canvasSizeX - h;
+        success = false;
+    }
+    else if ((iX - h) < 0)
+    {
+        x = h;
+        success = false;
+    }
+
+    if ((iY + h) > canvasSizeY)
+    {
+        y = canvasSizeY - h;
+        success = false;
+    }
+    else if ((iY - h) < 0)
+    {
+        y = h;
+        success = false;
+    }
+    return success;
+}
+
+bool Triangle::isResizeArea(int iX, int iY)
+{
+    return iX >= x + h - 10 && iX <= x + h &&
+           iY >= y + h - 10 && iY <= y + h;
 }

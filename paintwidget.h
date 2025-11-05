@@ -16,6 +16,7 @@ public:
     PaintWidget(QWidget *parent = nullptr);
     void keyPressEvent(QKeyEvent *event) override;
     void changeSelectedShape(QString iSelectedShape);
+    void changeColor(QColor iColor);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -33,6 +34,7 @@ private:
     bool isResizeEvent = false;
     bool isMoveEvent = false;
     QString selectedShape;
+    QColor color = Qt::green;
 
 };
 

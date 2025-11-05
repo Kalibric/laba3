@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QColorDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     void keyPressEvent(QKeyEvent *event) override;
     void shapeSelector(int index);
+    void colorSelector();
 
 };
 #endif // MAINWINDOW_H

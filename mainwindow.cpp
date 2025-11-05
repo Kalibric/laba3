@@ -8,8 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->ShapeSelector, &QComboBox::currentIndexChanged, this, &MainWindow::shapeSelector);
+    connect(ui->ColorSelector, &QAbstractButton::clicked, this, &MainWindow::colorSelector);
     ui->ShapeSelector->addItem("Круг", "Circle");
     ui->ShapeSelector->addItem("Квадрат", "Square");
+    ui->ShapeSelector->addItem("Треугольник", "Triangle");
 }
 MainWindow::~MainWindow()
 {
@@ -24,7 +26,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::shapeSelector(int index)
 {
     QString shapeType = ui->ShapeSelector->currentData().toString();
-    if (shapeType == ShapeTypes::CIRCLE)
-        ui->paintContainer->changeSelectedShape(ShapeTypes::CIRCLE);
-    //ShapeTypes s;
+    ui->paintContainer->changeSelectedShape(shapeType);
+}
+
+void MainWindow::colorSelector()
+{
+    QColor color = QColorDialog::getColor(Qt::green, this, "Выбор цвета");
+    if (color.isValid())
+    {
+        ui->paintContainer->changeColor(color);
+    }
 }

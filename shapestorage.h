@@ -23,6 +23,7 @@ public:
     bool isExistsShapeToCoord(int iX, int iY);
     void changeCanvasSize(int x, int y);
     bool isResizeAreaShapeSelectedToCoord(int iX, int iY);
+    void changeColorSelectedShapes(QColor color);
 
 private:
     vector<Shape*> storage;

@@ -55,10 +55,13 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 {
                     storage.unselectAll();
                     Shape *shape;
+                    qDebug() << selectedShape;
                     if (selectedShape == ShapeTypes::CIRCLE)
-                        shape = new Circle(x, y);
+                        shape = new Circle(x, y, color);
                     else if (selectedShape == ShapeTypes::SQUARE)
-                        shape = new Square(x, y);
+                        shape = new Square(x, y, color);
+                    else if (selectedShape == ShapeTypes::TRIANGLE)
+                        shape = new Triangle(x, y, color);
                     storage.add(shape);
                 }
                 update();
@@ -103,7 +106,7 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
         {
             int dx = event->pos().x() - lastPosition.x();
             int dy = event->pos().y() - lastPosition.y();
-            if (isResizeArea || isResizeEvent)
+            if ((isResizeArea || isResizeEvent) && !isMoveEvent)
             {
                 if (!isResizeEvent)
                     setCursor(Qt::SizeFDiagCursor);
@@ -127,7 +130,7 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
 void PaintWidget::keyPressEvent(QKeyEvent *event)
 {
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
-        if (event->key() == Qt::Key_Delete)
+    if (event->key() == Qt::Key_Delete)
     {
         storage.removeSelectedShapes();
         update();
@@ -152,4 +155,10 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
 void PaintWidget::changeSelectedShape(QString iSelectedShape)
 {
     selectedShape = iSelectedShape;
+}
+
+void PaintWidget::changeColor(QColor iColor)
+{
+    color = iColor;
+    storage.changeColorSelectedShapes(iColor);
 }
