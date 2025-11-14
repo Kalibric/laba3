@@ -1,7 +1,8 @@
 #include "shape.h"
-const QString ShapeTypes::CIRCLE = "Circle";
-const QString ShapeTypes::SQUARE = "Square";
-const QString ShapeTypes::TRIANGLE = "Triangle";
+const QString ShapeType::ShapeTypes::CIRCLE = "Circle";
+const QString ShapeType::ShapeTypes::SQUARE = "Square";
+const QString ShapeType::ShapeTypes::TRIANGLE = "Triangle";
+
 Shape::Shape()
 {
 

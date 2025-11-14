@@ -12,7 +12,7 @@ void PaintWidget::paintEvent(QPaintEvent *event)
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    storage.drawAllShapes(painter);
+    storage.draw(painter, ShapeType::FilterParams(ShapeType::Type::ALL));
     painter->end();
 }
 
@@ -47,7 +47,7 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 if (storage.isExistsSelectedToCoord(x, y))
                 {
                     if (ctrlPressed)
-                        storage.unSelectShapeToCoord(x, y);
+                        storage.unSelect(x, y);
                     else
                         storage.unselectAll();
                 }
@@ -56,11 +56,11 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                     storage.unselectAll();
                     Shape *shape;
                     qDebug() << selectedShape;
-                    if (selectedShape == ShapeTypes::CIRCLE)
+                    if (selectedShape == ShapeType::ShapeTypes::CIRCLE)
                         shape = new Circle(x, y, color);
-                    else if (selectedShape == ShapeTypes::SQUARE)
+                    else if (selectedShape == ShapeType::ShapeTypes::SQUARE)
                         shape = new Square(x, y, color);
-                    else if (selectedShape == ShapeTypes::TRIANGLE)
+                    else if (selectedShape == ShapeType::ShapeTypes::TRIANGLE)
                         shape = new Triangle(x, y, color);
                     storage.add(shape);
                 }
@@ -81,7 +81,7 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
         {
             if (!ctrlPressed)
                 storage.unselectAll();
-            isSelectEvent = storage.selectShapeToCoord(x, y);
+            isSelectEvent = storage.select(x, y);
         }
 
         lastPositionBefore = event->pos();
@@ -132,7 +132,7 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
     if (event->key() == Qt::Key_Delete)
     {
-        storage.removeSelectedShapes();
+        storage.remove();
         update();
     }
     else if (event->key() == Qt::Key_A && ctrlPressed)
@@ -165,8 +165,8 @@ void PaintWidget::changeColor(QColor iColor)
 
 void PaintWidget::test()
 {
-    GroupStorage* st = new GroupStorage();
-    st->Grouping(storage);
-    storage.add(st);
-    update();
+    // GroupStorage* st = new GroupStorage();
+    // st->Grouping(storage);
+    // storage.add(st);
+    // update();
 }

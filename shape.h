@@ -71,6 +71,7 @@ protected:
     int h = 50;
 };
 
+namespace ShapeType {
 class ShapeTypes final
 {
 public:
@@ -79,7 +80,36 @@ public:
     static const QString CIRCLE;
     static const QString SQUARE;
     static const QString TRIANGLE;
-    virtual ~ShapeTypes() {};
+    virtual ~ShapeTypes();
+
 };
 
+// class Type final
+// {
+// public:
+//     Type();
+//     virtual void s() = 0;
+//     static const int ALL = 0;
+//     static const int SELECTED = 1;
+
+// };
+enum class Type
+{
+    ALL = 0,
+    SELECTED = 1,
+    RESIZE_AREA = 2,
+    TO_COORDS = 3
+};
+struct FilterParams
+{
+    Type type = Type::ALL;
+    int x = 0;
+    int y = 0;
+
+    FilterParams(Type iType=Type::ALL, int iX=0, int iY=0) : type(iType), x(iX), y(iY)
+    {
+
+    }
+};
+}
 #endif // SHAPE_H

@@ -5,66 +5,92 @@ ShapeStorage::ShapeStorage()
 
 }
 
+vector<Shape*> ShapeStorage::get(ShapeType::FilterParams params)
+{
+    vector<Shape*> result;
+    if (params.type == ShapeType::Type::ALL)
+    {
+        result = storage;
+    }
+    else if (params.type == ShapeType::Type::SELECTED)
+    {
+        for (Shape* shape : storage)
+        {
+            if (shape->isSelect())
+                result.push_back(shape);
+        }
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA)
+    {
+        for (Shape* shape : storage)
+        {
+            if (shape->isResizeArea(0, 0))
+                result.push_back(shape);
+        }
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS)
+    {
+        for (Shape* shape : storage)
+        {
+            if (shape->isClicked(params.x, params.y))
+                result.push_back(shape);
+        }
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_UNSELECTED)
+    {
+        for (Shape* shape : storage)
+        {
+            if (shape->isClicked(params.x, params.y) && !(shape->isSelect()))
+                result.push_back(shape);
+        }
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_SELECTED)
+    {
+        for (Shape* shape : storage)
+        {
+            if (shape->isClicked(param.x, params.y) && shape->isSelect())
+                result.push_back(shape);
+        }
+    }
+
+    return result;
+}
+
 void ShapeStorage::add(Shape *iShape)
 {
     iShape->changeCanvasSize(canvasSizeX, canvasSizeY);
     storage.push_back(iShape);
 }
 
-void ShapeStorage::drawAllShapes(QPainter *painter)
+void ShapeStorage::draw(QPainter *painter, ShapeType::FilterParams type)
 {
-    for (Shape *shape : storage)
+    vector<Shape*> result = ShapeStorage::get(type);
+    for (Shape *shape : result)
     {
         shape->draw(painter);
     }
 }
 
-bool ShapeStorage::selectShapeToCoord(int iX, int iY)
+bool ShapeStorage::select(ShapeType::FilterParams params)
 {
-    bool result = false;
-    for (Shape *shape : storage)
-    {
-        if (shape->isClicked(iX, iY) && !shape->isSelect())
-        {
-            shape->select();
-            result = true;
-        }
-    }
-    return result;
-}
-
-bool ShapeStorage::unSelectShapeToCoord(int iX, int iY)
-{
-    bool result = false;
-    for (Shape *shape : storage)
-    {
-        if (shape->isClicked(iX, iY) && shape->isSelect())
-        {
-            shape->unSelect();
-            result = true;
-        }
-    }
-    return result;
-}
-
-void ShapeStorage::selectAll()
-{
-    for (Shape *shape : storage)
-    {
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape *shape : result)
         shape->select();
-    }
+
+    return result.size() > 0;
 }
 
-void ShapeStorage::unselectAll()
+bool ShapeStorage::unSelect(ShapeType::FilterParams params)
 {
-    for (Shape *shape : storage)
-    {
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape *shape : result)
         shape->unSelect();
-    }
+    return result.size() > 0;
 }
 
-void ShapeStorage::removeSelectedShapes()
+void ShapeStorage::remove()
 {
+    // vector<Shape*> result = ShapeStorage::get(params);
     for (auto it = storage.begin(); it != storage.end();)
     {
         Shape* shape = *it;
