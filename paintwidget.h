@@ -17,6 +17,7 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void changeSelectedShape(QString iSelectedShape);
     void changeColor(QColor iColor);
+    void test();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

@@ -5,11 +5,16 @@
 #include <vector>
 #include "shape.h"
 using namespace std;
+//int groupIndex = 0;
 class ShapeStorage
 {
 public:
     ShapeStorage();
     void add(Shape *iShape);
+    void addGroup(GroupStorage *iGroup)
+    {
+        groups.push_back(iGroup);
+    }
     void drawAllShapes(QPainter *painter);
     bool selectShapeToCoord(int iX, int iY);
     void selectAll();
@@ -24,11 +29,38 @@ public:
     void changeCanvasSize(int x, int y);
     bool isResizeAreaShapeSelectedToCoord(int iX, int iY);
     void changeColorSelectedShapes(QColor color);
+public:
+    vector<Shape*> storage;
+    vector<GroupStorage*> groups;
+    int canvasSizeX = 0;
+    int canvasSizeY = 0;
+};
+
+class GroupStorage : public ShapeStorage
+{
+public:
+    GroupStorage()
+    {
+        name = "G-" + 1;
+    }
+
+    void Grouping(ShapeStorage &storage){
+        for (int i = storage.storage.size()-1; i>=0; i--)
+        {
+            if (storage.storage[i]->isSelect())
+            {
+                this->storage.push_back(storage.storage[i]);
+                storage.storage.erase(storage.storage.begin()+i, storage.storage.begin()+i+1);
+            }
+        }
+        //storage->storage.push_back(this->storage);
+
+    }
 
 private:
     vector<Shape*> storage;
-    int canvasSizeX = 0;
-    int canvasSizeY = 0;
+    vector<GroupStorage*> s;
+    string name;
 };
 
 #endif // SHAPESTORAGE_H

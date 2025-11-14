@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connect(ui->ShapeSelector, &QComboBox::currentIndexChanged, this, &MainWindow::shapeSelector);
     connect(ui->ColorSelector, &QAbstractButton::clicked, this, &MainWindow::colorSelector);
+    connect(ui->pushButton, &QAbstractButton::clicked, this, &MainWindow::test);
     ui->ShapeSelector->addItem("Круг", "Circle");
     ui->ShapeSelector->addItem("Квадрат", "Square");
     ui->ShapeSelector->addItem("Треугольник", "Triangle");
@@ -36,4 +37,9 @@ void MainWindow::colorSelector()
     {
         ui->paintContainer->changeColor(color);
     }
+}
+
+void MainWindow::test()
+{
+    ui->paintContainer->test();
 }

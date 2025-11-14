@@ -162,3 +162,11 @@ void PaintWidget::changeColor(QColor iColor)
     color = iColor;
     storage.changeColorSelectedShapes(iColor);
 }
+
+void PaintWidget::test()
+{
+    GroupStorage* st = new GroupStorage();
+    st->Grouping(storage);
+    storage.add(st);
+    update();
+}

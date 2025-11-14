@@ -24,6 +24,7 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
     void shapeSelector(int index);
     void colorSelector();
+    void test();
 
 };
 #endif // MAINWINDOW_H

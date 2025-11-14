@@ -152,3 +152,4 @@ void ShapeStorage::changeColorSelectedShapes(QColor color)
             shape->setColor(color);
     }
 }
+
