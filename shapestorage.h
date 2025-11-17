@@ -15,18 +15,15 @@ public:
     // {
     //     groups.push_back(iGroup);
     // }
-    void draw(QPainter *painter, ShapeType::FilterParams params = ShapeType::FilterParams());
-    bool selectShape(ShapeType::FilterParams params = ShapeType::FilterParams());
-    bool unSelect(ShapeType::FilterParams params = ShapeType::FilterParams());
-    void remove();
-    void moveSelectedShapesRelative(int iX, int iY);
-    void resizeSelectedShapesRelative(int iSize);
-    bool isExistsSelectedToCoord(int iX, int iY);
-    bool isExistsSelectedShapes();
-    bool isExistsShapeToCoord(int iX, int iY);
+    void draw(ShapeType::FilterParams params, QPainter *painter);
+    bool select(ShapeType::FilterParams params);
+    bool unSelect(ShapeType::FilterParams params);
+    void remove(ShapeType::FilterParams params);
+    void moveRelative(ShapeType::FilterParams params, int x, int y);
+    void resizeRelative(ShapeType::FilterParams params, int iSize);
+    bool isExists(ShapeType::FilterParams params);
     void changeCanvasSize(int x, int y);
-    bool isResizeAreaShapeSelectedToCoord(int iX, int iY);
-    void changeColorSelectedShapes(QColor color);
+    void changeColor(ShapeType::FilterParams params, QColor color);
 private:
     vector<Shape*> storage;
     vector<Shape*> get(ShapeType::FilterParams type);

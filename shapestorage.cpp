@@ -15,42 +15,44 @@ vector<Shape*> ShapeStorage::get(ShapeType::FilterParams params)
     else if (params.type == ShapeType::Type::SELECTED)
     {
         for (Shape* shape : storage)
-        {
             if (shape->isSelect())
                 result.push_back(shape);
-        }
+    }
+    else if (params.type == ShapeType::Type::UNSELECTED)
+    {
+        for (Shape* shape : storage)
+            if (!shape->isSelect())
+                result.push_back(shape);
     }
     else if (params.type == ShapeType::Type::RESIZE_AREA)
     {
         for (Shape* shape : storage)
-        {
-            if (shape->isResizeArea(0, 0))
+            if (shape->isResizeArea(params.x, params.y))
                 result.push_back(shape);
-        }
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA_SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isSelect() && shape->isResizeArea(params.x, params.y))
+                result.push_back(shape);
     }
     else if (params.type == ShapeType::Type::TO_COORDS)
     {
         for (Shape* shape : storage)
-        {
-            if (shape->isClicked(params.x, params.y))
+            if (shape->isContaints(params.x, params.y))
                 result.push_back(shape);
-        }
     }
     else if (params.type == ShapeType::Type::TO_COORDS_UNSELECTED)
     {
         for (Shape* shape : storage)
-        {
-            if (shape->isClicked(params.x, params.y) && !(shape->isSelect()))
+            if (shape->isContaints(params.x, params.y) && !(shape->isSelect()))
                 result.push_back(shape);
-        }
     }
     else if (params.type == ShapeType::Type::TO_COORDS_SELECTED)
     {
         for (Shape* shape : storage)
-        {
-            if (shape->isClicked(param.x, params.y) && shape->isSelect())
+            if (shape->isContaints(params.x, params.y) && shape->isSelect())
                 result.push_back(shape);
-        }
     }
 
     return result;
@@ -62,13 +64,11 @@ void ShapeStorage::add(Shape *iShape)
     storage.push_back(iShape);
 }
 
-void ShapeStorage::draw(QPainter *painter, ShapeType::FilterParams type)
+void ShapeStorage::draw(ShapeType::FilterParams type, QPainter *painter)
 {
     vector<Shape*> result = ShapeStorage::get(type);
     for (Shape *shape : result)
-    {
         shape->draw(painter);
-    }
 }
 
 bool ShapeStorage::select(ShapeType::FilterParams params)
@@ -88,94 +88,97 @@ bool ShapeStorage::unSelect(ShapeType::FilterParams params)
     return result.size() > 0;
 }
 
-void ShapeStorage::remove()
+void ShapeStorage::remove(ShapeType::FilterParams params)
 {
-    // vector<Shape*> result = ShapeStorage::get(params);
-    for (auto it = storage.begin(); it != storage.end();)
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape* shape : result)
     {
-        Shape* shape = *it;
-        if (shape->isSelect())
-        {
-            delete shape;
-            it = storage.erase(it);
-        }
-        else
-            ++it;
+        delete shape;
+        auto it = std::find(storage.begin(), storage.end(), shape);
+        if (it != storage.end())
+            storage.erase(it);
     }
 }
 
-void ShapeStorage::moveSelectedShapesRelative(int iX, int iY)
+void ShapeStorage::moveRelative(ShapeType::FilterParams params, int x, int y)
 {
-    for (Shape *shape : storage)
-    {
-        if (shape->isSelect())
-            shape->changeRelativeCoord(iX, iY);
-    }
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape* shape : result)
+        shape->moveRelative(x, y);
 }
 
-bool ShapeStorage::isExistsSelectedShapes()
+void ShapeStorage::resizeRelative(ShapeType::FilterParams params, int iSize)
 {
-    for (Shape *shape : storage)
-    {
-        if (shape->isSelect())
-            return true;
-    }
-    return false;
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape *shape : result)
+        shape->relativeResize(iSize);
 }
 
-bool ShapeStorage::isExistsSelectedToCoord(int iX, int iY)
+bool ShapeStorage::isExists(ShapeType::FilterParams params)
 {
-    for (Shape *shape : storage)
+    if (params.type == ShapeType::Type::ALL)
     {
-        if (shape->isClicked(iX, iY))
-            return shape->isSelect();
+        return storage.size() > 0;
     }
-    return false;
-}
+    else if (params.type == ShapeType::Type::SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isSelect())
+                return true;
+    }
+    else if (params.type == ShapeType::Type::UNSELECTED)
+    {
+        for (Shape* shape : storage)
+            if (!shape->isSelect())
+                return true;
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA)
+    {
+        for (Shape* shape : storage)
+            if (shape->isResizeArea(params.x, params.y))
+                return true;
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA_SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isSelect() && shape->isResizeArea(params.x, params.y))
+                return true;
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y))
+                return true;
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_UNSELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y) && !(shape->isSelect()))
+                return true;
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y) && shape->isSelect())
+                return true;
+    }
 
-bool ShapeStorage::isExistsShapeToCoord(int iX, int iY)
-{
-    for (Shape *shape : storage)
-    {
-        if (shape->isClicked(iX, iY))
-            return true;
-    }
     return false;
 }
 
 void ShapeStorage::changeCanvasSize(int iX, int iY)
 {
+    vector<Shape*> result = ShapeStorage::get(ShapeType::FilterParams(ShapeType::Type::ALL));
     canvasSizeX = iX;
     canvasSizeY = iY;
-    for (Shape *shape : storage)
+    for (Shape *shape : result)
         shape->changeCanvasSize(iX, iY);
 }
 
-void ShapeStorage::resizeSelectedShapesRelative(int iSize)
+void ShapeStorage::changeColor(ShapeType::FilterParams params, QColor color)
 {
-    for (Shape *shape : storage)
-    {
-        if (shape->isSelect())
-            shape->relativeResize(iSize);
-    }
-}
-
-bool ShapeStorage::isResizeAreaShapeSelectedToCoord(int iX, int iY)
-{
-    for (Shape *shape : storage)
-    {
-        if (shape->isSelect() && shape->isResizeArea(iX, iY))
-            return true;
-    }
-    return false;
-}
-
-void ShapeStorage::changeColorSelectedShapes(QColor color)
-{
-    for (Shape *shape : storage)
-    {
-        if (shape->isSelect())
-            shape->setColor(color);
-    }
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape *shape : result)
+        shape->changeColor(color);
 }
 

@@ -12,7 +12,7 @@ void Shape::changeCanvasSize(int iX, int iY)
 {
     canvasSizeX = iX;
     canvasSizeY = iY;
-    changeRelativeCoord(0, 0);
+    moveRelative(0, 0);
 }
 
 void Shape::select()
@@ -35,7 +35,7 @@ bool Shape::validateCoord(int iX, int iY)
     return (iX > 0) && (iX < canvasSizeX) && (iY > 0) && (iY < canvasSizeY);
 }
 
-void Shape::changeRelativeCoord(int iX, int iY)
+void Shape::moveRelative(int iX, int iY)
 {
     bool validate = validateCoord(x + iX, y + iY);
     if (validate)
@@ -44,7 +44,7 @@ void Shape::changeRelativeCoord(int iX, int iY)
         y += iY;
     }
 }
-void Shape::setColor(QColor iColor)
+void Shape::changeColor(QColor iColor)
 {
     color = iColor;
 }
@@ -62,7 +62,7 @@ Circle::Circle(int iX, int iY, QColor iColor, int iRadius)
     color = iColor;
 }
 
-bool Circle::isClicked(int iX, int iY)
+bool Circle::isContaints(int iX, int iY)
 {
     int dx = iX - x;
     int dy = iY - y;
@@ -142,7 +142,7 @@ Square::Square(int iX, int iY, QColor iColor, int iLength)
     color = iColor;
 }
 
-bool Square::isClicked(int iX, int iY)
+bool Square::isContaints(int iX, int iY)
 {
     return (iX >= x - lenght && iX <= x + lenght &&
             iY >= y - lenght && iY <= y + lenght);
@@ -214,7 +214,7 @@ Triangle::Triangle(int iX, int iY, QColor iColor, int iH)
     color = iColor;
 }
 
-bool Triangle::isClicked(int iX, int iY)
+bool Triangle::isContaints(int iX, int iY)
 {
     QPolygon triangle;
     triangle << QPoint(x, y - h) << QPoint(x - h, y + h) << QPoint(x + h, y + h);

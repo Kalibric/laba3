@@ -7,17 +7,17 @@ class Shape
 {
 public:
     Shape();
-    virtual bool isClicked(int iX, int iY) { return false; };
+    virtual bool isContaints(int iX, int iY) { return false; };
     virtual void draw(QPainter *painter) {};
     virtual void changeCanvasSize(int iX, int iY);
     virtual void relativeResize(int iSize) {};
     virtual bool isResizeArea(int iX, int iY) {return false;};
     virtual bool validateCoord(int iX, int iY);
-    void setColor(QColor iColor);
+    void changeColor(QColor iColor);
     void select();
     void unSelect();
     bool isSelect();
-    void changeRelativeCoord(int iX, int iY);
+    void moveRelative(int iX, int iY);
 protected:
     int x = 0;
     int y = 0;
@@ -33,7 +33,7 @@ class Circle: public Shape
 public:
     Circle();
     Circle(int iX, int iY, QColor iColor, int iRadius = 50);
-    bool isClicked(int iX, int iY) override;
+    bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
     bool isResizeArea(int iX, int iY) override;
@@ -47,7 +47,7 @@ class Square: public Shape
 public:
     Square();
     Square(int iX, int iY, QColor iColor, int length = 50);
-    bool isClicked(int iX, int iY) override;
+    bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
     bool validateCoord(int iX, int iY) override;
@@ -62,7 +62,7 @@ class Triangle: public Shape
 public:
     // Triangle();
     Triangle(int iX, int iY, QColor iColor, int h = 50);
-    bool isClicked(int iX, int iY) override;
+    bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
     bool validateCoord(int iX, int iY) override;
@@ -97,8 +97,12 @@ enum class Type
 {
     ALL = 0,
     SELECTED = 1,
-    RESIZE_AREA = 2,
-    TO_COORDS = 3
+    UNSELECTED = 2,
+    RESIZE_AREA = 3,
+    TO_COORDS = 4,
+    TO_COORDS_UNSELECTED = 5,
+    TO_COORDS_SELECTED = 6,
+    RESIZE_AREA_SELECTED = 7
 };
 struct FilterParams
 {

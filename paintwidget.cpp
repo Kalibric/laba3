@@ -12,7 +12,7 @@ void PaintWidget::paintEvent(QPaintEvent *event)
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    storage.draw(painter, ShapeType::FilterParams(ShapeType::Type::ALL));
+    storage.draw(ShapeType::FilterParams(ShapeType::Type::ALL), painter);
     painter->end();
 }
 
@@ -24,11 +24,10 @@ void PaintWidget::resizeEvent(QResizeEvent *event)
 
 void PaintWidget::wheelEvent(QWheelEvent *event)
 {
-    if (storage.isExistsSelectedShapes())
-    {
-        storage.resizeSelectedShapesRelative(event->angleDelta().y() > 0 ? 5 : -5);
-        update();
-    }
+    storage.resizeRelative(
+        ShapeType::FilterParams(ShapeType::Type::SELECTED),
+        event->angleDelta().y() > 0 ? 5 : -5);
+    update();
 }
 
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -44,18 +43,17 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
             bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
             if (!isSelectEvent)
             {
-                if (storage.isExistsSelectedToCoord(x, y))
+                if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::SELECTED, x, y)))
                 {
                     if (ctrlPressed)
-                        storage.unSelect(x, y);
+                        storage.unSelect(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_SELECTED, x, y));
                     else
-                        storage.unselectAll();
+                        storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
                 }
                 else
                 {
-                    storage.unselectAll();
-                    Shape *shape;
-                    qDebug() << selectedShape;
+                    storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
+                    Shape* shape;
                     if (selectedShape == ShapeType::ShapeTypes::CIRCLE)
                         shape = new Circle(x, y, color);
                     else if (selectedShape == ShapeType::ShapeTypes::SQUARE)
@@ -77,11 +75,11 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
-        if (storage.isExistsShapeToCoord(x, y) && !storage.isExistsSelectedToCoord(x, y))
+        if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_UNSELECTED, x, y)))
         {
             if (!ctrlPressed)
-                storage.unselectAll();
-            isSelectEvent = storage.select(x, y);
+                storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
+            isSelectEvent = storage.select(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_UNSELECTED, x, y));
         }
 
         lastPositionBefore = event->pos();
@@ -92,9 +90,10 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
 
 void PaintWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (storage.isExistsSelectedShapes())
+    int x = event->pos().x(), y = event->pos().y();
+    if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::SELECTED)))
     {
-        bool isResizeArea = storage.isResizeAreaShapeSelectedToCoord(event->pos().x(), event->pos().y());
+        bool isResizeArea = storage.isExists(ShapeType::FilterParams(ShapeType::Type::RESIZE_AREA_SELECTED, x, y));
         if (!isResizeEvent && !isMoveEvent)
         {
             if (isResizeArea)
@@ -111,14 +110,14 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
                 if (!isResizeEvent)
                     setCursor(Qt::SizeFDiagCursor);
                 isResizeEvent = true;
-                storage.resizeSelectedShapesRelative((dx + dy) / 2);
+                storage.resizeRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), (dx + dy) / 2);
             }
             else
             {
                 if (!isMoveEvent)
                     setCursor(Qt::ClosedHandCursor);
                 isMoveEvent = true;
-                storage.moveSelectedShapesRelative(dx, dy);
+                storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), dx, dy);
             }
             lastPosition = event->pos();
         }
@@ -132,22 +131,22 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
     if (event->key() == Qt::Key_Delete)
     {
-        storage.remove();
+        storage.remove(ShapeType::FilterParams(ShapeType::Type::SELECTED));
         update();
     }
     else if (event->key() == Qt::Key_A && ctrlPressed)
     {
-        storage.selectAll();
+        storage.select(ShapeType::FilterParams(ShapeType::Type::ALL));
         update();
     }
     else if (event->key() == Qt::Key_Equal)
     {
-        storage.resizeSelectedShapesRelative(5);
+        storage.resizeRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), 5);
         update();
     }
     else if (event->key() == Qt::Key_Minus)
     {
-        storage.resizeSelectedShapesRelative(-5);
+        storage.resizeRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), -5);
         update();
     }
 }
@@ -160,7 +159,7 @@ void PaintWidget::changeSelectedShape(QString iSelectedShape)
 void PaintWidget::changeColor(QColor iColor)
 {
     color = iColor;
-    storage.changeColorSelectedShapes(iColor);
+    storage.changeColor(ShapeType::FilterParams(ShapeType::Type::SELECTED), iColor);
 }
 
 void PaintWidget::test()
