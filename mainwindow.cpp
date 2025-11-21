@@ -9,7 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connect(ui->ShapeSelector, &QComboBox::currentIndexChanged, this, &MainWindow::shapeSelector);
     connect(ui->ColorSelector, &QAbstractButton::clicked, this, &MainWindow::colorSelector);
-    connect(ui->pushButton, &QAbstractButton::clicked, this, &MainWindow::test);
+    connect(ui->GroupingButton, &QAbstractButton::clicked, this, &MainWindow::grouping);
+    connect(ui->SaveShapesButton, &QAbstractButton::clicked, this, &MainWindow::saveButtonClick);
+    connect(ui->paintContainer, &PaintWidget::groupingButton, this, &MainWindow::groupingButton);
+    connect(ui->paintContainer, &PaintWidget::unGroupingButton, this, &MainWindow::unGroupingButton);
+    connect(ui->paintContainer, &PaintWidget::deactivateButton, this, &MainWindow::deactivateGroupingButton);
     ui->ShapeSelector->addItem("Круг", "Circle");
     ui->ShapeSelector->addItem("Квадрат", "Square");
     ui->ShapeSelector->addItem("Треугольник", "Triangle");
@@ -39,7 +43,35 @@ void MainWindow::colorSelector()
     }
 }
 
-void MainWindow::test()
+void MainWindow::grouping()
 {
-    ui->paintContainer->test();
+    ui->paintContainer->groupingButtonClick();
 }
+
+void MainWindow::groupingButton()
+{
+    ui->GroupingButton->setEnabled(true);
+    ui->GroupingButton->setText("Сгруппировать");
+}
+
+void MainWindow::unGroupingButton()
+{
+    ui->GroupingButton->setEnabled(true);
+    ui->GroupingButton->setText("Разгруппировать");
+}
+
+void MainWindow::deactivateGroupingButton()
+{
+    ui->GroupingButton->setText("Нет выделенных");
+    ui->GroupingButton->setEnabled(false);
+}
+
+void MainWindow::saveButtonClick()
+{
+    ui->paintContainer->saveButton();
+}
+
+// void MainWindow::setGroupingButton(std::string text)
+// {
+//     ui->GroupingButton->setText(text);
+// }

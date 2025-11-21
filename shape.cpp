@@ -35,6 +35,115 @@ bool Shape::validateCoord(int iX, int iY)
     return (iX > 0) && (iX < canvasSizeX) && (iY > 0) && (iY < canvasSizeY);
 }
 
+GroupShape::~GroupShape()
+{
+    for (auto shape : storage)
+    {
+        delete shape;
+    }
+}
+
+bool GroupShape::isContaints(int iX, int iY)
+{
+    for (auto shape : storage)
+        if (shape->isContaints(iX, iY))
+            return true;
+
+    return false;
+}
+
+void GroupShape::draw(QPainter *painter)
+{
+    for (auto shape : storage)
+        shape->draw(painter);
+}
+
+void GroupShape::changeCanvasSize(int iX, int iY)
+{
+    for (auto shape : storage)
+        shape->changeCanvasSize(iX, iY);
+}
+
+void GroupShape::relativeResize(int iSize)
+{
+    for (auto shape : storage)
+        shape->relativeResize(iSize);
+}
+
+bool GroupShape::isResizeArea(int iX, int iY)
+{
+    for (auto shape : storage)
+        if (shape->isResizeArea(iX, iY))
+            return true;
+    return false;
+}
+
+bool GroupShape::validateCoord(int iX, int iY)
+{
+    for (auto shape : storage)
+        if (shape->validateCoord(iX, iY))
+            return true;
+    return false;
+}
+
+void GroupShape::changeColor(QColor color)
+{
+    for (auto shape : storage)
+        shape->changeColor(color);
+}
+
+void GroupShape::select()
+{
+    for (auto shape : storage)
+        shape->select();
+}
+
+void GroupShape::unSelect()
+{
+    for (auto shape : storage)
+        shape->unSelect();
+}
+
+bool GroupShape::isSelect()
+{
+    for (auto shape : storage)
+        if (shape->isSelect())
+            return true;
+    return false;
+}
+
+void GroupShape::moveRelative(int iX, int iY)
+{
+    for (auto shape : storage)
+        shape->moveRelative(iX, iY);
+}
+
+void GroupShape::saveInFile(QTextStream &out, int level)
+{
+    for (int i = 0; i < level * 2; i++)
+        out << " ";
+    out << "<GroupStorage>" << "\n";
+    for (auto shape : storage)
+        shape->saveInFile(out, level + 1);
+    for (int i = 0; i < level * 2; i++)
+        out << " ";
+    out << "</GroupStorage>" << "\n";
+}
+
+void GroupShape::add(Shape* shape)
+{
+    storage.push_back(shape);
+}
+
+vector<Shape*> GroupShape::unGrouping()
+{
+    vector<Shape*> result;
+    for (auto shape : storage)
+        result.push_back(shape);
+    storage.clear();
+    return result;
+}
+
 void Shape::moveRelative(int iX, int iY)
 {
     bool validate = validateCoord(x + iX, y + iY);
@@ -129,6 +238,13 @@ void Circle::relativeResize(int iSize)
     validateCoord(x, y);
 }
 
+void Circle::saveInFile(QTextStream &out, int level)
+{
+    for (int i = 0; i < level * 2; i++)
+        out << " ";
+    out << "<Circle>" << "radius:" << radius << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Circle>" << "\n";
+}
+
 Square::Square()
 {
 
@@ -196,7 +312,6 @@ bool Square::validateCoord(int iX, int iY)
         y = lenght;
         success = false;
     }
-    qDebug() << success;
     return success;
 }
 
@@ -204,6 +319,13 @@ bool Square::isResizeArea(int iX, int iY)
 {
     return iX >= x + lenght - 10 && iX <= x + lenght &&
            iY >= y + lenght - 10 && iY <= y + lenght;
+}
+
+void Square::saveInFile(QTextStream &out, int level)
+{
+    for (int i = 0; i < level * 2; i++)
+        out << " ";
+    out << "<Square>" << "lenght:" << lenght << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Square>" << "\n";
 }
 
 Triangle::Triangle(int iX, int iY, QColor iColor, int iH)
@@ -281,4 +403,11 @@ bool Triangle::isResizeArea(int iX, int iY)
 {
     return iX >= x + h - 10 && iX <= x + h &&
            iY >= y + h - 10 && iY <= y + h;
+}
+
+void Triangle::saveInFile(QTextStream &out, int level)
+{
+    for (int i = 0; i < level * 2; i++)
+        out << " ";
+    out << "<Triangle>" << "h:" << h << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Triangle>" << "\n";
 }

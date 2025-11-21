@@ -4,17 +4,24 @@
 #include <QDebug>
 #include <vector>
 #include "shape.h"
+#include <QFile>
 using namespace std;
 //int groupIndex = 0;
+
+class Group
+{
+public:
+    string name;
+    bool enable = true;
+    vector<Shape*> storage;
+    vector<Group*> groups;
+};
+
 class ShapeStorage
 {
 public:
     ShapeStorage();
     void add(Shape *iShape);
-    // void addGroup(GroupStorage *iGroup)
-    // {
-    //     groups.push_back(iGroup);
-    // }
     void draw(ShapeType::FilterParams params, QPainter *painter);
     bool select(ShapeType::FilterParams params);
     bool unSelect(ShapeType::FilterParams params);
@@ -24,10 +31,15 @@ public:
     bool isExists(ShapeType::FilterParams params);
     void changeCanvasSize(int x, int y);
     void changeColor(ShapeType::FilterParams params, QColor color);
+    void addGroup(ShapeType::FilterParams params);
+    void unGroup(ShapeType::FilterParams params);
+    bool isSelectedInOneGroup();
+    int count(ShapeType::FilterParams params);
+    void saveInFile();
+
 private:
     vector<Shape*> storage;
     vector<Shape*> get(ShapeType::FilterParams type);
-    // vector<GroupStorage*> groups;
     int canvasSizeX = 0;
     int canvasSizeY = 0;
 };

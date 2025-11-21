@@ -182,3 +182,53 @@ void ShapeStorage::changeColor(ShapeType::FilterParams params, QColor color)
         shape->changeColor(color);
 }
 
+void ShapeStorage::addGroup(ShapeType::FilterParams params)
+{
+    Shape* group = new GroupShape();
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape* shape : result)
+    {
+        group->add(shape);
+        storage.erase(std::remove(storage.begin(), storage.end(), shape), storage.end());
+    }
+    storage.push_back(group);
+}
+
+void ShapeStorage::unGroup(ShapeType::FilterParams params)
+{
+    vector<Shape*> result = ShapeStorage::get(params);
+    for (Shape* group : result)
+    {
+        vector<Shape*> shapes = group->unGrouping();
+        for (Shape* shape : shapes)
+        {
+            storage.push_back(shape);
+        }
+    }
+}
+
+bool ShapeStorage::isSelectedInOneGroup()
+{
+    vector<Shape*> result = ShapeStorage::get(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    return result.size() == 1 && result[0]->isGroup();
+}
+
+int ShapeStorage::count(ShapeType::FilterParams params)
+{
+    vector<Shape*> result = ShapeStorage::get(params);
+    return result.size();
+}
+
+void ShapeStorage::saveInFile()
+{
+    QFile file("Shape.txt");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream out(&file);
+        out << "<ShapeStorage>" << "\n";
+        for (auto shape : storage)
+            shape->saveInFile(out, 1);
+        out << "</ShapeStorage>";
+        file.close();
+    }
+}

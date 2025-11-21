@@ -46,13 +46,13 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::SELECTED, x, y)))
                 {
                     if (ctrlPressed)
-                        storage.unSelect(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_SELECTED, x, y));
+                        unSelect(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_SELECTED, x, y));
                     else
-                        storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
+                        unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
                 }
                 else
                 {
-                    storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
+                    unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
                     Shape* shape;
                     if (selectedShape == ShapeType::ShapeTypes::CIRCLE)
                         shape = new Circle(x, y, color);
@@ -78,8 +78,9 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
         if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_UNSELECTED, x, y)))
         {
             if (!ctrlPressed)
-                storage.unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
-            isSelectEvent = storage.select(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_UNSELECTED, x, y));
+                unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
+            isSelectEvent = true;
+            select(ShapeType::FilterParams(ShapeType::Type::TO_COORDS_UNSELECTED, x, y));
         }
 
         lastPositionBefore = event->pos();
@@ -136,7 +137,7 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
     }
     else if (event->key() == Qt::Key_A && ctrlPressed)
     {
-        storage.select(ShapeType::FilterParams(ShapeType::Type::ALL));
+        select(ShapeType::FilterParams(ShapeType::Type::ALL));
         update();
     }
     else if (event->key() == Qt::Key_Equal)
@@ -162,10 +163,40 @@ void PaintWidget::changeColor(QColor iColor)
     storage.changeColor(ShapeType::FilterParams(ShapeType::Type::SELECTED), iColor);
 }
 
-void PaintWidget::test()
+void PaintWidget::groupingButtonClick()
 {
-    // GroupStorage* st = new GroupStorage();
-    // st->Grouping(storage);
-    // storage.add(st);
-    // update();
+    if (storage.isSelectedInOneGroup())
+        storage.unGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    else
+        storage.addGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    if (storage.isSelectedInOneGroup())
+        emit unGroupingButton();
+    else
+        emit groupingButton();
+    update();
+}
+
+void PaintWidget::select(ShapeType::FilterParams params)
+{
+    storage.select(params);
+    if (storage.isSelectedInOneGroup())
+        emit unGroupingButton();
+    else if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) > 1)
+        emit groupingButton();
+}
+
+void PaintWidget::unSelect(ShapeType::FilterParams params)
+{
+    storage.unSelect(params);
+    if (storage.isSelectedInOneGroup())
+        emit unGroupingButton();
+    else if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) > 1)
+        emit groupingButton();
+    else
+        emit deactivateButton();
+}
+
+void PaintWidget::saveButton()
+{
+    storage.saveInFile();
 }

@@ -12,12 +12,21 @@
 
 class PaintWidget : public QWidget
 {
+    Q_OBJECT
 public:
     PaintWidget(QWidget *parent = nullptr);
     void keyPressEvent(QKeyEvent *event) override;
     void changeSelectedShape(QString iSelectedShape);
     void changeColor(QColor iColor);
-    void test();
+    void groupingButtonClick();
+    void select(ShapeType::FilterParams params);
+    void unSelect(ShapeType::FilterParams params);
+    void saveButton();
+
+signals:
+    void groupingButton();
+    void unGroupingButton();
+    void deactivateButton();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

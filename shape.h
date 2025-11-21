@@ -3,21 +3,32 @@
 #include <QPainter>
 #include <QDebug>
 #include <QPolygon>
+#include <vector>
+using namespace std;
 class Shape
 {
 public:
     Shape();
-    virtual bool isContaints(int iX, int iY) { return false; };
-    virtual void draw(QPainter *painter) {};
+    virtual bool isContaints(int iX, int iY) { return false; }
+    virtual void draw(QPainter *painter) {}
     virtual void changeCanvasSize(int iX, int iY);
-    virtual void relativeResize(int iSize) {};
-    virtual bool isResizeArea(int iX, int iY) {return false;};
+    virtual void relativeResize(int iSize) {}
+    virtual bool isResizeArea(int iX, int iY) {return false;}
     virtual bool validateCoord(int iX, int iY);
-    void changeColor(QColor iColor);
-    void select();
-    void unSelect();
-    bool isSelect();
-    void moveRelative(int iX, int iY);
+    virtual void changeColor(QColor iColor);
+    virtual void select();
+    virtual void unSelect();
+    virtual bool isSelect();
+    virtual void moveRelative(int iX, int iY);
+    virtual void saveInFile(QTextStream &out, int level) {}
+    virtual void load() {}
+
+    // Composite
+    virtual bool isGroup() { return false; }
+    virtual void add(Shape* child) {}
+    virtual vector<Shape*> unGrouping() {}
+
+
 protected:
     int x = 0;
     int y = 0;
@@ -25,7 +36,33 @@ protected:
     int canvasSizeY;
     bool selected = false;
     QColor color = Qt::green;
+};
 
+class GroupShape : public Shape
+{
+private:
+    vector<Shape*> storage;
+
+public:
+    ~GroupShape();
+    bool isContaints(int iX, int iY) override;
+    void draw(QPainter *painter) override;
+    void changeCanvasSize(int iX, int iY) override;
+    void relativeResize(int iSize) override;
+    bool isResizeArea(int iX, int iY) override;
+    bool validateCoord(int iX, int iY) override;
+    void changeColor(QColor color) override;
+    void select() override;
+    void unSelect() override;
+    bool isSelect() override;
+    void moveRelative(int iX, int iY) override;
+    void saveInFile(QTextStream &out, int level) override;
+    void load() override;
+
+    // Composite
+    bool isGroup() override {return true;}
+    void add(Shape* shape) override;
+    vector<Shape*> unGrouping() override;
 };
 
 class Circle: public Shape
@@ -38,6 +75,9 @@ public:
     void relativeResize(int iSize) override;
     bool isResizeArea(int iX, int iY) override;
     bool validateCoord(int iX, int iY) override;
+    void saveInFile(QTextStream &out, int level) override;
+    void load() override;
+
 protected:
     int radius = 50;
 };
@@ -52,6 +92,8 @@ public:
     void relativeResize(int iSize) override;
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
+    void saveInFile(QTextStream &out, int level) override;
+    void load() override;
 
 protected:
     int lenght = 50;
@@ -67,6 +109,9 @@ public:
     void relativeResize(int iSize) override;
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
+    void saveInFile(QTextStream &out, int level) override;
+    void load() override;
+
 protected:
     int h = 50;
 };

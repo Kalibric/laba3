@@ -24,7 +24,13 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
     void shapeSelector(int index);
     void colorSelector();
-    void test();
+    void grouping();
+    void saveButtonClick();
+
+public slots:
+    void groupingButton();
+    void unGroupingButton();
+    void deactivateGroupingButton();
 
 };
 #endif // MAINWINDOW_H
