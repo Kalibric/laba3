@@ -1,9 +1,18 @@
 #include "shapestorage.h"
 using namespace std;
-ShapeStorage::ShapeStorage()
-{
 
-}
+// Shape* ShapeStorage::createShape(int x, int y, QColor color)
+// {
+//     Shape* shape;
+//     if (currentShape == ShapeType::ShapeTypes::CIRCLE)
+//         shape = new Circle(x, y, color);
+//     else if (currentShape == ShapeType::ShapeTypes::SQUARE)
+//         shape = new Square(x, y, color);
+//     else if (currentShape == ShapeType::ShapeTypes::TRIANGLE)
+//         shape = new Triangle(x, y, color);
+
+//     return shape;
+// }
 
 vector<Shape*> ShapeStorage::get(ShapeType::FilterParams params)
 {
@@ -64,6 +73,20 @@ void ShapeStorage::add(Shape *iShape)
     storage.push_back(iShape);
 }
 
+void ShapeStorage::add(int x, int y, QColor color)
+{
+    Shape* shape;
+    if (currentShape == ShapeType::ShapeTypes::CIRCLE)
+        shape = new Circle(x, y, color);
+    else if (currentShape == ShapeType::ShapeTypes::SQUARE)
+        shape = new Square(x, y, color);
+    else if (currentShape == ShapeType::ShapeTypes::TRIANGLE)
+        shape = new Triangle(x, y, color);
+
+    shape->changeCanvasSize(canvasSizeX, canvasSizeY);
+    storage.push_back(shape);
+}
+
 void ShapeStorage::draw(ShapeType::FilterParams type, QPainter *painter)
 {
     vector<Shape*> result = ShapeStorage::get(type);
@@ -97,6 +120,16 @@ void ShapeStorage::remove(ShapeType::FilterParams params)
         auto it = std::find(storage.begin(), storage.end(), shape);
         if (it != storage.end())
             storage.erase(it);
+    }
+}
+
+void ShapeStorage::remove(Shape *iShape)
+{
+    auto it = find(storage.begin(), storage.end(), iShape);
+    if (it == storage.end())
+    {
+        storage.erase(it);
+        delete iShape;
     }
 }
 
@@ -219,6 +252,11 @@ int ShapeStorage::count(ShapeType::FilterParams params)
 {
     vector<Shape*> result = ShapeStorage::get(params);
     return result.size();
+}
+
+void ShapeStorage::changeCurrentShape(QString iCurrentShape)
+{
+    currentShape = iCurrentShape;
 }
 
 void ShapeStorage::saveInFile()

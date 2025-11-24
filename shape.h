@@ -10,6 +10,7 @@ class Shape
 {
 public:
     Shape();
+    Shape(Shape &iShape);
     virtual bool isContaints(int iX, int iY) { return false; }
     virtual void draw(QPainter *painter) {}
     virtual void changeCanvasSize(int iX, int iY);
@@ -27,7 +28,7 @@ public:
     // Composite
     virtual bool isGroup() { return false; }
     virtual void add(Shape* child) {}
-    virtual vector<Shape*> unGrouping() {}
+    virtual vector<Shape*> unGrouping() { return vector<Shape*>(); }
 
 
 protected:
@@ -69,7 +70,8 @@ class Circle: public Shape
 {
 public:
     Circle();
-    Circle(int iX, int iY, QColor iColor, int iRadius = 50);
+    Circle(Circle &iCircle);
+    Circle(int iX, int iY, QColor iColor = Qt::green, int iRadius = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
@@ -86,7 +88,8 @@ class Square: public Shape
 {
 public:
     Square();
-    Square(int iX, int iY, QColor iColor, int length = 50);
+    Square(Square &iSquare);
+    Square(int iX, int iY, QColor iColor = Qt::green, int length = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
@@ -103,7 +106,8 @@ class Triangle: public Shape
 {
 public:
     Triangle();
-    Triangle(int iX, int iY, QColor iColor, int h = 50);
+    Triangle(Triangle &iTriangle);
+    Triangle(int iX, int iY, QColor iColor = Qt::green, int h = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void relativeResize(int iSize) override;
@@ -121,7 +125,6 @@ class ShapeTypes final
 {
 public:
     ShapeTypes();
-    virtual void s() = 0;
     static const QString CIRCLE;
     static const QString SQUARE;
     static const QString TRIANGLE;
@@ -129,15 +132,6 @@ public:
 
 };
 
-// class Type final
-// {
-// public:
-//     Type();
-//     virtual void s() = 0;
-//     static const int ALL = 0;
-//     static const int SELECTED = 1;
-
-// };
 enum class Type
 {
     ALL = 0,

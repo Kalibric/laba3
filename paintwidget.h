@@ -9,6 +9,8 @@
 #include <QMoveEvent>
 #include <QWheelEvent>
 #include "shapestorage.h"
+#include <QMenu>
+#include <QAction>
 
 class PaintWidget : public QWidget
 {
@@ -24,10 +26,15 @@ public:
     void saveButton();
     void loadButton();
 
+    void setGroupingEvent(QAction *newGroupingEvent);
+    void resetGroupingEvent();
+
 signals:
     void groupingButton();
     void unGroupingButton();
     void deactivateButton();
+
+    void groupingEventChanged();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -44,8 +51,23 @@ private:
     bool isSelectEvent = false;
     bool isResizeEvent = false;
     bool isMoveEvent = false;
-    QString selectedShape;
     QColor color = Qt::green;
+    QMenu* contextMenu;
+    QAction* removeEvent;
+    QAction* setColorEvent;
+    QAction* menuGroupingEvent;
+    QAction* menuUnGroupingEvent;
+    QAction* selectAllEvent;
+
+    // Q_PROPERTY(QAction *menuGroupingEvent READ menuGroupingEvent WRITE setGroupingEvent RESET resetGroupingEvent NOTIFY groupingEventChanged FINAL)
+
+private slots:
+    void removeAction();
+    void setColorAction();
+    void groupingAction();
+    void unGroupingAction();
+
+    void selectAllAction();
 
 };
 

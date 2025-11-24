@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->loadButton, &QAbstractButton::clicked, this, &MainWindow::loadButtonClick);
     ui->ShapeSelector->addItem("Круг", "Circle");
     ui->ShapeSelector->addItem("Квадрат", "Square");
-    ui->ShapeSelector->addItem("Треугольник", "Triangle");
+    ui->ShapeSelector->addItem("Триугольник", "Triangle");
 }
 MainWindow::~MainWindow()
 {
@@ -37,7 +37,7 @@ void MainWindow::shapeSelector(int index)
 
 void MainWindow::colorSelector()
 {
-    QColor color = QColorDialog::getColor(Qt::green, this, "Выбор цвета");
+    QColor color = QColorDialog::getColor(Qt::green, this, "");
     if (color.isValid())
     {
         ui->paintContainer->changeColor(color);
@@ -63,7 +63,7 @@ void MainWindow::unGroupingButton()
 
 void MainWindow::deactivateGroupingButton()
 {
-    ui->GroupingButton->setText("Нет выделенных");
+    ui->GroupingButton->setText("");
     ui->GroupingButton->setEnabled(false);
 }
 

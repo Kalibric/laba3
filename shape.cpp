@@ -8,6 +8,16 @@ Shape::Shape()
 
 }
 
+Shape::Shape(Shape &iShape)
+{
+    x = iShape.x;
+    y = iShape.y;
+    canvasSizeX = iShape.canvasSizeX;
+    canvasSizeY = iShape.canvasSizeY;
+    selected = iShape.selected;
+    color = iShape.color;
+}
+
 void Shape::changeCanvasSize(int iX, int iY)
 {
     canvasSizeX = iX;
@@ -163,6 +173,11 @@ Circle::Circle()
 
 }
 
+Circle::Circle(Circle &iCircle) : Shape(iCircle)
+{
+    radius = iCircle.radius;
+}
+
 Circle::Circle(int iX, int iY, QColor iColor, int iRadius)
 {
     x = iX;
@@ -272,6 +287,11 @@ Square::Square()
 
 }
 
+Square::Square(Square &iSquare) : Shape(iSquare)
+{
+    lenght = iSquare.lenght;
+}
+
 Square::Square(int iX, int iY, QColor iColor, int iLength)
 {
     x = iX;
@@ -375,6 +395,11 @@ void Square::load(QString &text)
 Triangle::Triangle()
 {
 
+}
+
+Triangle::Triangle(Triangle &iTriangle) : Shape(iTriangle)
+{
+    h = iTriangle.h;
 }
 
 Triangle::Triangle(int iX, int iY, QColor iColor, int iH)

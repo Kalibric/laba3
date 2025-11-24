@@ -5,6 +5,16 @@ PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 {
     storage.changeCanvasSize(this->size().width(), this->size().height());
     setMouseTracking(true);
+    removeEvent = new QAction("Удалить", this);
+    setColorEvent = new QAction("Изменить цвет", this);
+    menuGroupingEvent = new QAction("Сгруппировать", this);
+    menuUnGroupingEvent = new QAction("Разгруппировать", this);
+    selectAllEvent = new QAction("Выделить все", this);
+    connect(removeEvent, &QAction::triggered, this, &PaintWidget::removeAction);
+    connect(setColorEvent, &QAction::triggered, this, &PaintWidget::setColorAction);
+    connect(menuGroupingEvent, &QAction::triggered, this, &PaintWidget::groupingAction);
+    connect(menuUnGroupingEvent, &QAction::triggered, this, &PaintWidget::unGroupingAction);
+    connect(selectAllEvent, &QAction::triggered, this, &PaintWidget::selectAllAction);
 }
 
 void PaintWidget::paintEvent(QPaintEvent *event)
@@ -30,6 +40,19 @@ void PaintWidget::wheelEvent(QWheelEvent *event)
     update();
 }
 
+void PaintWidget::setGroupingEvent(QAction *newGroupingEvent)
+{
+    if (menuGroupingEvent == newGroupingEvent)
+        return;
+    menuGroupingEvent = newGroupingEvent;
+    emit groupingEventChanged();
+}
+
+void PaintWidget::resetGroupingEvent()
+{
+    setGroupingEvent({}); // TODO: Adapt to use your actual default value
+}
+
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     int x = event->pos().x(), y = event->pos().y();
@@ -53,18 +76,30 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 else
                 {
                     unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
-                    Shape* shape;
-                    if (selectedShape == ShapeType::ShapeTypes::CIRCLE)
-                        shape = new Circle(x, y, color);
-                    else if (selectedShape == ShapeType::ShapeTypes::SQUARE)
-                        shape = new Square(x, y, color);
-                    else if (selectedShape == ShapeType::ShapeTypes::TRIANGLE)
-                        shape = new Triangle(x, y, color);
-                    storage.add(shape);
+                    storage.add(x, y);
                 }
                 update();
             }
         }
+    }
+    else if (event->button() == Qt::RightButton)
+    {
+        contextMenu = new QMenu(this);
+        if (storage.isExists(ShapeType::FilterParams(ShapeType::Type::SELECTED)))
+        {
+            contextMenu->addAction(removeEvent);
+            contextMenu->addAction(setColorEvent);
+            if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) > 1)
+            {
+                contextMenu->addAction(menuGroupingEvent);
+            }
+            else if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) == 1 && storage.isSelectedInOneGroup())
+            {
+                contextMenu->addAction(menuUnGroupingEvent);
+            }
+        }
+        contextMenu->addAction(selectAllEvent);
+        contextMenu->exec(event->globalPos());
     }
 }
 
@@ -174,7 +209,7 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
 
 void PaintWidget::changeSelectedShape(QString iSelectedShape)
 {
-    selectedShape = iSelectedShape;
+    storage.changeCurrentShape(iSelectedShape);
 }
 
 void PaintWidget::changeColor(QColor iColor)
@@ -225,4 +260,29 @@ void PaintWidget::loadButton()
 {
     storage.load();
     update();
+}
+
+void PaintWidget::removeAction()
+{
+    storage.remove(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+}
+
+void PaintWidget::setColorAction()
+{
+    storage.changeColor(ShapeType::FilterParams(ShapeType::Type::SELECTED), color);
+}
+
+void PaintWidget::groupingAction()
+{
+    storage.addGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+}
+
+void PaintWidget::unGroupingAction()
+{
+    storage.unGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+}
+
+void PaintWidget::selectAllAction()
+{
+    storage.select(ShapeType::FilterParams(ShapeType::Type::ALL));
 }
