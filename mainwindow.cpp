@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->paintContainer, &PaintWidget::groupingButton, this, &MainWindow::groupingButton);
     connect(ui->paintContainer, &PaintWidget::unGroupingButton, this, &MainWindow::unGroupingButton);
     connect(ui->paintContainer, &PaintWidget::deactivateButton, this, &MainWindow::deactivateGroupingButton);
+    connect(ui->loadButton, &QAbstractButton::clicked, this, &MainWindow::loadButtonClick);
     ui->ShapeSelector->addItem("Круг", "Circle");
     ui->ShapeSelector->addItem("Квадрат", "Square");
     ui->ShapeSelector->addItem("Треугольник", "Triangle");
@@ -70,6 +71,12 @@ void MainWindow::saveButtonClick()
 {
     ui->paintContainer->saveButton();
 }
+
+void MainWindow::loadButtonClick()
+{
+    ui->paintContainer->loadButton();
+}
+
 
 // void MainWindow::setGroupingButton(std::string text)
 // {

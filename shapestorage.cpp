@@ -204,6 +204,8 @@ void ShapeStorage::unGroup(ShapeType::FilterParams params)
         {
             storage.push_back(shape);
         }
+        auto it = std::remove(storage.begin(), storage.end(), group);
+        storage.erase(it, storage.end());
     }
 }
 
@@ -231,4 +233,64 @@ void ShapeStorage::saveInFile()
         out << "</ShapeStorage>";
         file.close();
     }
+}
+
+void ShapeStorage::load()
+{
+    QFile file("Shape.txt");
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&file);
+        for (auto shape : createShapes(in))
+            storage.push_back(shape);
+    }
+}
+
+vector<Shape*> ShapeStorage::createShapes(QTextStream &in)
+{
+    QString line;
+    vector<Shape*> localStorage;
+    while (!in.atEnd())
+    {
+        line = in.readLine();
+        QRegularExpression type("<(.*?)>");
+        QRegularExpressionMatch typeMatch = type.match(line);
+        if (typeMatch.hasMatch())
+        {
+            QString typeShape = typeMatch.captured(1);
+            if (typeShape == "Circle")
+            {
+                Shape* shape = new Circle();
+                shape->load(line);
+                shape->changeCanvasSize(canvasSizeX, canvasSizeY);
+                localStorage.push_back(shape);
+            }
+            else if (typeShape == "Square")
+            {
+                Shape* shape = new Square();
+                shape->load(line);
+                shape->changeCanvasSize(canvasSizeX, canvasSizeY);
+                localStorage.push_back(shape);
+            }
+            else if (typeShape == "Triangle")
+            {
+                Shape* shape = new Triangle();
+                shape->load(line);
+                shape->changeCanvasSize(canvasSizeX, canvasSizeY);
+                localStorage.push_back(shape);
+            }
+            else if (typeShape == "GroupStorage")
+            {
+                Shape* shape = new GroupShape();
+                for (auto sh : createShapes(in))
+                    shape->add(sh);
+                localStorage.push_back(shape);
+            }
+            else if (typeShape == "/GroupStorage")
+            {
+                return localStorage;
+            }
+        }
+    }
+    return localStorage;
 }

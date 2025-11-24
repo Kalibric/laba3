@@ -72,9 +72,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="loadButton">
           <property name="text">
-           <string>PushButton</string>
+           <string>Загрузить</string>
           </property>
          </widget>
         </item>
@@ -113,7 +113,7 @@
      <x>0</x>
      <y>0</y>
      <width>932</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

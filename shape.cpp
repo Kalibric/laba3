@@ -245,6 +245,28 @@ void Circle::saveInFile(QTextStream &out, int level)
     out << "<Circle>" << "radius:" << radius << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Circle>" << "\n";
 }
 
+void Circle::load(QString &text)
+{
+    QRegularExpression radiusExp("radius:\\s*(\\d+)");
+    QRegularExpression xExp("x:\\s*(\\d+)");
+    QRegularExpression yExp("y:\\s*(\\d+)");
+    QRegularExpression colorExp("color:\\s*(#[0-9A-Fa-f]{6})");
+
+    QRegularExpressionMatch radiusMatch = radiusExp.match(text);
+    QRegularExpressionMatch xMatch = xExp.match(text);
+    QRegularExpressionMatch yMatch = yExp.match(text);
+    QRegularExpressionMatch colorMatch = colorExp.match(text);
+
+    if (radiusMatch.hasMatch())
+        radius = radiusMatch.captured(1).toInt();
+    if (xMatch.hasMatch())
+        x = xMatch.captured(1).toInt();
+    if (yMatch.hasMatch())
+        y = yMatch.captured(1).toInt();
+    if (colorMatch.hasMatch())
+        color = colorMatch.captured(1);
+}
+
 Square::Square()
 {
 
@@ -326,6 +348,33 @@ void Square::saveInFile(QTextStream &out, int level)
     for (int i = 0; i < level * 2; i++)
         out << " ";
     out << "<Square>" << "lenght:" << lenght << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Square>" << "\n";
+}
+
+void Square::load(QString &text)
+{
+    QRegularExpression lenghtExp("lenght:\\s*(\\d+)");
+    QRegularExpression xExp("x:\\s*(\\d+)");
+    QRegularExpression yExp("y:\\s*(\\d+)");
+    QRegularExpression colorExp("color:\\s*(#[0-9A-Fa-f]{6})");
+
+    QRegularExpressionMatch lenghtMatch = lenghtExp.match(text);
+    QRegularExpressionMatch xMatch = xExp.match(text);
+    QRegularExpressionMatch yMatch = yExp.match(text);
+    QRegularExpressionMatch colorMatch = colorExp.match(text);
+
+    if (lenghtMatch.hasMatch())
+        lenght = lenghtMatch.captured(1).toInt();
+    if (xMatch.hasMatch())
+        x = xMatch.captured(1).toInt();
+    if (yMatch.hasMatch())
+        y = yMatch.captured(1).toInt();
+    if (colorMatch.hasMatch())
+        color = colorMatch.captured(1);
+}
+
+Triangle::Triangle()
+{
+
 }
 
 Triangle::Triangle(int iX, int iY, QColor iColor, int iH)
@@ -410,4 +459,26 @@ void Triangle::saveInFile(QTextStream &out, int level)
     for (int i = 0; i < level * 2; i++)
         out << " ";
     out << "<Triangle>" << "h:" << h << ", x:" << x << ", y:" << y << ", color:" << color.name() << "</Triangle>" << "\n";
+}
+
+void Triangle::load(QString &text)
+{
+    QRegularExpression hExp("h:\\s*(\\d+)");
+    QRegularExpression xExp("x:\\s*(\\d+)");
+    QRegularExpression yExp("y:\\s*(\\d+)");
+    QRegularExpression colorExp("color:\\s*(#[0-9A-Fa-f]{6})");
+
+    QRegularExpressionMatch hMatch = hExp.match(text);
+    QRegularExpressionMatch xMatch = xExp.match(text);
+    QRegularExpressionMatch yMatch = yExp.match(text);
+    QRegularExpressionMatch colorMatch = colorExp.match(text);
+
+    if (hMatch.hasMatch())
+        h = hMatch.captured(1).toInt();
+    if (xMatch.hasMatch())
+        x = xMatch.captured(1).toInt();
+    if (yMatch.hasMatch())
+        y = yMatch.captured(1).toInt();
+    if (colorMatch.hasMatch())
+        color = colorMatch.captured(1);
 }

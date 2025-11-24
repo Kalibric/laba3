@@ -22,6 +22,7 @@ public:
     void select(ShapeType::FilterParams params);
     void unSelect(ShapeType::FilterParams params);
     void saveButton();
+    void loadButton();
 
 signals:
     void groupingButton();

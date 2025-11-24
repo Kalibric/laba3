@@ -150,6 +150,26 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
         storage.resizeRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), -5);
         update();
     }
+    else if (event->key() == Qt::Key_Left)
+    {
+        storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), -1, 0);
+        update();
+    }
+    else if (event->key() == Qt::Key_Up)
+    {
+        storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), 0, -1);
+        update();
+    }
+    else if (event->key() == Qt::Key_Right)
+    {
+        storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), 1, 0);
+        update();
+    }
+    else if (event->key() == Qt::Key_Down)
+    {
+        storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), 0, 1);
+        update();
+    }
 }
 
 void PaintWidget::changeSelectedShape(QString iSelectedShape)
@@ -199,4 +219,10 @@ void PaintWidget::unSelect(ShapeType::FilterParams params)
 void PaintWidget::saveButton()
 {
     storage.saveInFile();
+}
+
+void PaintWidget::loadButton()
+{
+    storage.load();
+    update();
 }

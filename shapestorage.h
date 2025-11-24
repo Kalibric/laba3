@@ -5,17 +5,8 @@
 #include <vector>
 #include "shape.h"
 #include <QFile>
+#include <QRegularExpression>
 using namespace std;
-//int groupIndex = 0;
-
-class Group
-{
-public:
-    string name;
-    bool enable = true;
-    vector<Shape*> storage;
-    vector<Group*> groups;
-};
 
 class ShapeStorage
 {
@@ -36,10 +27,12 @@ public:
     bool isSelectedInOneGroup();
     int count(ShapeType::FilterParams params);
     void saveInFile();
+    void load();
 
 private:
     vector<Shape*> storage;
     vector<Shape*> get(ShapeType::FilterParams type);
+    vector<Shape*> createShapes(QTextStream &in);
     int canvasSizeX = 0;
     int canvasSizeY = 0;
 };

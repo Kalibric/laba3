@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QPolygon>
 #include <vector>
+#include <QRegularExpression>
 using namespace std;
 class Shape
 {
@@ -21,7 +22,7 @@ public:
     virtual bool isSelect();
     virtual void moveRelative(int iX, int iY);
     virtual void saveInFile(QTextStream &out, int level) {}
-    virtual void load() {}
+    virtual void load(QString &text) {}
 
     // Composite
     virtual bool isGroup() { return false; }
@@ -57,7 +58,6 @@ public:
     bool isSelect() override;
     void moveRelative(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
-    void load() override;
 
     // Composite
     bool isGroup() override {return true;}
@@ -76,7 +76,7 @@ public:
     bool isResizeArea(int iX, int iY) override;
     bool validateCoord(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
-    void load() override;
+    void load(QString &text) override;
 
 protected:
     int radius = 50;
@@ -93,7 +93,7 @@ public:
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
-    void load() override;
+    void load(QString &text) override;
 
 protected:
     int lenght = 50;
@@ -102,7 +102,7 @@ protected:
 class Triangle: public Shape
 {
 public:
-    // Triangle();
+    Triangle();
     Triangle(int iX, int iY, QColor iColor, int h = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
@@ -110,7 +110,7 @@ public:
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
-    void load() override;
+    void load(QString &text) override;
 
 protected:
     int h = 50;
