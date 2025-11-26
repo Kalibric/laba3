@@ -14,7 +14,7 @@ public:
     virtual bool isContaints(int iX, int iY) { return false; }
     virtual void draw(QPainter *painter) {}
     virtual void changeCanvasSize(int iX, int iY);
-    virtual void relativeResize(int iSize) {}
+    virtual void resizeRelative(int iSize) {}
     virtual bool isResizeArea(int iX, int iY) {return false;}
     virtual bool validateCoord(int iX, int iY);
     virtual void changeColor(QColor iColor);
@@ -24,6 +24,8 @@ public:
     virtual void moveRelative(int iX, int iY);
     virtual void saveInFile(QTextStream &out, int level) {}
     virtual void load(QString &text) {}
+    virtual Shape* clone() = 0;
+    virtual int getSize() = 0;
 
     // Composite
     virtual bool isGroup() { return false; }
@@ -46,11 +48,13 @@ private:
     vector<Shape*> storage;
 
 public:
+    GroupShape() = default;
+    GroupShape(GroupShape &iGroup);
     ~GroupShape();
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
     void changeCanvasSize(int iX, int iY) override;
-    void relativeResize(int iSize) override;
+    void resizeRelative(int iSize) override;
     bool isResizeArea(int iX, int iY) override;
     bool validateCoord(int iX, int iY) override;
     void changeColor(QColor color) override;
@@ -59,6 +63,8 @@ public:
     bool isSelect() override;
     void moveRelative(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
+    GroupShape* clone() override;
+    int getSize() override {return 0;}
 
     // Composite
     bool isGroup() override {return true;}
@@ -74,11 +80,13 @@ public:
     Circle(int iX, int iY, QColor iColor = Qt::green, int iRadius = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
-    void relativeResize(int iSize) override;
+    void resizeRelative(int iSize) override;
     bool isResizeArea(int iX, int iY) override;
     bool validateCoord(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
     void load(QString &text) override;
+    Circle* clone() override;
+    int getSize() override;
 
 protected:
     int radius = 50;
@@ -92,11 +100,13 @@ public:
     Square(int iX, int iY, QColor iColor = Qt::green, int length = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
-    void relativeResize(int iSize) override;
+    void resizeRelative(int iSize) override;
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
     void load(QString &text) override;
+    Square* clone() override;
+    int getSize() override;
 
 protected:
     int lenght = 50;
@@ -110,14 +120,21 @@ public:
     Triangle(int iX, int iY, QColor iColor = Qt::green, int h = 50);
     bool isContaints(int iX, int iY) override;
     void draw(QPainter *painter) override;
-    void relativeResize(int iSize) override;
+    void resizeRelative(int iSize) override;
     bool validateCoord(int iX, int iY) override;
     bool isResizeArea(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
     void load(QString &text) override;
+    Triangle* clone() override;
+    int getSize() override;
 
 protected:
     int h = 50;
+};
+
+class ShapeFactory {
+public:
+    static Shape* create(const QString& type, int x, int y, QColor color, int size = 50);
 };
 
 namespace ShapeType {

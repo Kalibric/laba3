@@ -11,6 +11,9 @@
 #include "shapestorage.h"
 #include <QMenu>
 #include <QAction>
+#include "command.h"
+#include <QColorDialog>
+#include <QFileDialog>
 
 class PaintWidget : public QWidget
 {
@@ -28,6 +31,7 @@ public:
 
     void setGroupingEvent(QAction *newGroupingEvent);
     void resetGroupingEvent();
+    void validateGroupingButton();
 
 signals:
     void groupingButton();
@@ -51,13 +55,22 @@ private:
     bool isSelectEvent = false;
     bool isResizeEvent = false;
     bool isMoveEvent = false;
+    QString currentShapeType = ShapeType::ShapeTypes::CIRCLE;
     QColor color = Qt::green;
     QMenu* contextMenu;
+    QMenu* changeShapeType;
     QAction* removeEvent;
     QAction* setColorEvent;
     QAction* menuGroupingEvent;
     QAction* menuUnGroupingEvent;
     QAction* selectAllEvent;
+
+    QAction* circleType;
+    QAction* squareType;
+    QAction* triangleType;
+    CommandManager manager;
+    int resize = 0;
+
 
     // Q_PROPERTY(QAction *menuGroupingEvent READ menuGroupingEvent WRITE setGroupingEvent RESET resetGroupingEvent NOTIFY groupingEventChanged FINAL)
 
@@ -66,6 +79,9 @@ private slots:
     void setColorAction();
     void groupingAction();
     void unGroupingAction();
+    void changeShapeTypeToCircle();
+    void changeShapeTypeToSquare();
+    void changeShapeTypeToTriangle();
 
     void selectAllAction();
 

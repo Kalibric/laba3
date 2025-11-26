@@ -5,6 +5,13 @@ PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 {
     storage.changeCanvasSize(this->size().width(), this->size().height());
     setMouseTracking(true);
+    changeShapeType = new QMenu("Изменить фигуру", this);
+    circleType = new QAction("Круг", this);
+    squareType = new QAction("Квадрат", this);
+    triangleType = new QAction("Триугольник", this);
+    changeShapeType->addAction(circleType);
+    changeShapeType->addAction(squareType);
+    changeShapeType->addAction(triangleType);
     removeEvent = new QAction("Удалить", this);
     setColorEvent = new QAction("Изменить цвет", this);
     menuGroupingEvent = new QAction("Сгруппировать", this);
@@ -15,6 +22,9 @@ PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
     connect(menuGroupingEvent, &QAction::triggered, this, &PaintWidget::groupingAction);
     connect(menuUnGroupingEvent, &QAction::triggered, this, &PaintWidget::unGroupingAction);
     connect(selectAllEvent, &QAction::triggered, this, &PaintWidget::selectAllAction);
+    connect(circleType, &QAction::triggered, this, &PaintWidget::changeShapeTypeToCircle);
+    connect(squareType, &QAction::triggered, this, &PaintWidget::changeShapeTypeToSquare);
+    connect(triangleType, &QAction::triggered, this, &PaintWidget::changeShapeTypeToTriangle);
 }
 
 void PaintWidget::paintEvent(QPaintEvent *event)
@@ -50,7 +60,7 @@ void PaintWidget::setGroupingEvent(QAction *newGroupingEvent)
 
 void PaintWidget::resetGroupingEvent()
 {
-    setGroupingEvent({}); // TODO: Adapt to use your actual default value
+    setGroupingEvent({});
 }
 
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -58,6 +68,11 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
     int x = event->pos().x(), y = event->pos().y();
     if (event->button() == Qt::LeftButton)
     {
+        if (isMoveEvent)
+            manager.add(new MoveShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), lastPosition.x() - lastPositionBefore.x(), lastPosition.y() - lastPositionBefore.y()), false);
+        else if (isResizeEvent)
+            manager.add(new ResizeShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), resize), false);
+        resize = 0;
         isResizeEvent = false;
         isMoveEvent = false;
         setCursor(Qt::ArrowCursor);
@@ -76,7 +91,7 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 else
                 {
                     unSelect(ShapeType::FilterParams(ShapeType::Type::ALL));
-                    storage.add(x, y);
+                    manager.add(new AddShape(storage, x, y, color, currentShapeType));
                 }
                 update();
             }
@@ -89,6 +104,7 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
         {
             contextMenu->addAction(removeEvent);
             contextMenu->addAction(setColorEvent);
+            contextMenu->addMenu(changeShapeType);
             if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) > 1)
             {
                 contextMenu->addAction(menuGroupingEvent);
@@ -143,6 +159,7 @@ void PaintWidget::mouseMoveEvent(QMouseEvent *event)
             int dy = event->pos().y() - lastPosition.y();
             if ((isResizeArea || isResizeEvent) && !isMoveEvent)
             {
+                resize += (dx + dy) / 2;
                 if (!isResizeEvent)
                     setCursor(Qt::SizeFDiagCursor);
                 isResizeEvent = true;
@@ -167,7 +184,7 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
     if (event->key() == Qt::Key_Delete)
     {
-        storage.remove(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+        manager.add(new RemoveShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED)));
         update();
     }
     else if (event->key() == Qt::Key_A && ctrlPressed)
@@ -205,25 +222,49 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
         storage.moveRelative(ShapeType::FilterParams(ShapeType::Type::SELECTED), 0, 1);
         update();
     }
+    else if (event->key() == Qt::Key_Z && ctrlPressed)
+    {
+        manager.undo();
+        validateGroupingButton();
+        update();
+    }
+    else if (event->key() == Qt::Key_Y && ctrlPressed)
+    {
+        manager.execute();
+        validateGroupingButton();
+        update();
+    }
+}
+
+void PaintWidget::validateGroupingButton()
+{
+    int count = storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    if (count > 1)
+        emit groupingButton();
+    else if (count == 1 && storage.isSelectedInOneGroup())
+        emit unGroupingButton();
+    else
+        emit deactivateButton();
 }
 
 void PaintWidget::changeSelectedShape(QString iSelectedShape)
 {
-    storage.changeCurrentShape(iSelectedShape);
+    currentShapeType = iSelectedShape;
 }
 
 void PaintWidget::changeColor(QColor iColor)
 {
+    if (storage.count(ShapeType::FilterParams(ShapeType::Type::SELECTED)) > 0)
+        manager.add(new ChangeColorShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), color, iColor));
     color = iColor;
-    storage.changeColor(ShapeType::FilterParams(ShapeType::Type::SELECTED), iColor);
 }
 
 void PaintWidget::groupingButtonClick()
 {
     if (storage.isSelectedInOneGroup())
-        storage.unGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+        manager.add(new UnGroupingShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED)));
     else
-        storage.addGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+        manager.add(new GroupingShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED)));
     if (storage.isSelectedInOneGroup())
         emit unGroupingButton();
     else
@@ -253,12 +294,15 @@ void PaintWidget::unSelect(ShapeType::FilterParams params)
 
 void PaintWidget::saveButton()
 {
-    storage.saveInFile();
+    QString filename = QFileDialog::getSaveFileName(this, "Сохранение", "Shape.txt");
+    storage.saveInFile(filename);
 }
 
 void PaintWidget::loadButton()
 {
-    storage.load();
+    QString filename = QFileDialog::getOpenFileName(this, "Выбор файла", "Shape.txt");
+    manager.clear();
+    storage.load(filename);
     update();
 }
 
@@ -269,20 +313,40 @@ void PaintWidget::removeAction()
 
 void PaintWidget::setColorAction()
 {
-    storage.changeColor(ShapeType::FilterParams(ShapeType::Type::SELECTED), color);
+    QColor newColor = QColorDialog::getColor(Qt::green, this, "");
+    if (newColor.isValid())
+        manager.add(new ChangeColorShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), color, newColor));
 }
 
 void PaintWidget::groupingAction()
 {
-    storage.addGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    manager.add(new GroupingShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED)));
 }
 
 void PaintWidget::unGroupingAction()
 {
-    storage.unGroup(ShapeType::FilterParams(ShapeType::Type::SELECTED));
+    manager.add(new UnGroupingShape(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED)));
 }
 
 void PaintWidget::selectAllAction()
 {
     storage.select(ShapeType::FilterParams(ShapeType::Type::ALL));
+}
+
+void PaintWidget::changeShapeTypeToCircle()
+{
+    manager.add(new ChangeShapeType(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), ShapeType::ShapeTypes::CIRCLE));
+    update();
+}
+
+void PaintWidget::changeShapeTypeToSquare()
+{
+    manager.add(new ChangeShapeType(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), ShapeType::ShapeTypes::SQUARE));
+    update();
+}
+
+void PaintWidget::changeShapeTypeToTriangle()
+{
+    manager.add(new ChangeShapeType(storage, ShapeType::FilterParams(ShapeType::Type::SELECTED), ShapeType::ShapeTypes::TRIANGLE));
+    update();
 }

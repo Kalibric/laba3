@@ -1,18 +1,60 @@
 #include "shapestorage.h"
 using namespace std;
 
-// Shape* ShapeStorage::createShape(int x, int y, QColor color)
-// {
-//     Shape* shape;
-//     if (currentShape == ShapeType::ShapeTypes::CIRCLE)
-//         shape = new Circle(x, y, color);
-//     else if (currentShape == ShapeType::ShapeTypes::SQUARE)
-//         shape = new Square(x, y, color);
-//     else if (currentShape == ShapeType::ShapeTypes::TRIANGLE)
-//         shape = new Triangle(x, y, color);
-
-//     return shape;
-// }
+vector<Shape*> ShapeStorage::clone(ShapeType::FilterParams params)
+{
+    vector<Shape*> result;
+    if (params.type == ShapeType::Type::ALL)
+    {
+        for (Shape* shape : storage)
+        {
+            result.push_back(shape->clone());
+        }
+    }
+    else if (params.type == ShapeType::Type::SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isSelect())
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::UNSELECTED)
+    {
+        for (Shape* shape : storage)
+            if (!shape->isSelect())
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA)
+    {
+        for (Shape* shape : storage)
+            if (shape->isResizeArea(params.x, params.y))
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::RESIZE_AREA_SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isSelect() && shape->isResizeArea(params.x, params.y))
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y))
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_UNSELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y) && !(shape->isSelect()))
+                result.push_back(shape->clone());
+    }
+    else if (params.type == ShapeType::Type::TO_COORDS_SELECTED)
+    {
+        for (Shape* shape : storage)
+            if (shape->isContaints(params.x, params.y) && shape->isSelect())
+                result.push_back(shape->clone());
+    }
+    return result;
+}
 
 vector<Shape*> ShapeStorage::get(ShapeType::FilterParams params)
 {
@@ -73,20 +115,6 @@ void ShapeStorage::add(Shape *iShape)
     storage.push_back(iShape);
 }
 
-void ShapeStorage::add(int x, int y, QColor color)
-{
-    Shape* shape;
-    if (currentShape == ShapeType::ShapeTypes::CIRCLE)
-        shape = new Circle(x, y, color);
-    else if (currentShape == ShapeType::ShapeTypes::SQUARE)
-        shape = new Square(x, y, color);
-    else if (currentShape == ShapeType::ShapeTypes::TRIANGLE)
-        shape = new Triangle(x, y, color);
-
-    shape->changeCanvasSize(canvasSizeX, canvasSizeY);
-    storage.push_back(shape);
-}
-
 void ShapeStorage::draw(ShapeType::FilterParams type, QPainter *painter)
 {
     vector<Shape*> result = ShapeStorage::get(type);
@@ -126,10 +154,10 @@ void ShapeStorage::remove(ShapeType::FilterParams params)
 void ShapeStorage::remove(Shape *iShape)
 {
     auto it = find(storage.begin(), storage.end(), iShape);
-    if (it == storage.end())
+    if (it != storage.end())
     {
         storage.erase(it);
-        delete iShape;
+        // delete iShape;
     }
 }
 
@@ -140,11 +168,21 @@ void ShapeStorage::moveRelative(ShapeType::FilterParams params, int x, int y)
         shape->moveRelative(x, y);
 }
 
+void ShapeStorage::moveRelative(Shape* shape, int x, int y)
+{
+    shape->moveRelative(x, y);
+}
+
 void ShapeStorage::resizeRelative(ShapeType::FilterParams params, int iSize)
 {
     vector<Shape*> result = ShapeStorage::get(params);
     for (Shape *shape : result)
-        shape->relativeResize(iSize);
+        shape->resizeRelative(iSize);
+}
+
+void ShapeStorage::resizeRelative(Shape* shape, int iSize)
+{
+    shape->resizeRelative(iSize);
 }
 
 bool ShapeStorage::isExists(ShapeType::FilterParams params)
@@ -215,6 +253,11 @@ void ShapeStorage::changeColor(ShapeType::FilterParams params, QColor color)
         shape->changeColor(color);
 }
 
+void ShapeStorage::changeColor(Shape* shape, QColor color)
+{
+    shape->changeColor(color);
+}
+
 void ShapeStorage::addGroup(ShapeType::FilterParams params)
 {
     Shape* group = new GroupShape();
@@ -254,14 +297,24 @@ int ShapeStorage::count(ShapeType::FilterParams params)
     return result.size();
 }
 
-void ShapeStorage::changeCurrentShape(QString iCurrentShape)
+void ShapeStorage::changeShapeType(Shape* shape, QString newType)
 {
-    currentShape = iCurrentShape;
+    Shape* newShape = ShapeFactory::create(newType, x, y, color, size);
+    for (size_t i = 0; i < storage.size(); ++i)
+    {
+        if (storage[i] == shape)
+        {
+            storage[i] =
+        }
+    }
+    // Shape* newShape = shape->changeTypeTo(newType);
+    remove(shape);
+    // add(newShape);
 }
 
-void ShapeStorage::saveInFile()
+void ShapeStorage::saveInFile(QString iFile)
 {
-    QFile file("Shape.txt");
+    QFile file(iFile);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream out(&file);
@@ -273,11 +326,12 @@ void ShapeStorage::saveInFile()
     }
 }
 
-void ShapeStorage::load()
+void ShapeStorage::load(QString iFile)
 {
-    QFile file("Shape.txt");
+    QFile file(iFile);
     if (file.open(QIODevice::ReadOnly))
     {
+        remove(ShapeType::FilterParams(ShapeType::Type::ALL));
         QTextStream in(&file);
         for (auto shape : createShapes(in))
             storage.push_back(shape);

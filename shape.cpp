@@ -45,6 +45,14 @@ bool Shape::validateCoord(int iX, int iY)
     return (iX > 0) && (iX < canvasSizeX) && (iY > 0) && (iY < canvasSizeY);
 }
 
+GroupShape::GroupShape(GroupShape &iGroup)
+{
+    for (Shape* shape : iGroup.storage)
+    {
+        storage.push_back(shape->clone());
+    }
+}
+
 GroupShape::~GroupShape()
 {
     for (auto shape : storage)
@@ -74,10 +82,10 @@ void GroupShape::changeCanvasSize(int iX, int iY)
         shape->changeCanvasSize(iX, iY);
 }
 
-void GroupShape::relativeResize(int iSize)
+void GroupShape::resizeRelative(int iSize)
 {
     for (auto shape : storage)
-        shape->relativeResize(iSize);
+        shape->resizeRelative(iSize);
 }
 
 bool GroupShape::isResizeArea(int iX, int iY)
@@ -145,6 +153,11 @@ void GroupShape::add(Shape* shape)
     storage.push_back(shape);
 }
 
+GroupShape* GroupShape::clone()
+{
+    return new GroupShape(*this);
+}
+
 vector<Shape*> GroupShape::unGrouping()
 {
     vector<Shape*> result;
@@ -195,7 +208,7 @@ bool Circle::isContaints(int iX, int iY)
 
 void Circle::draw(QPainter *painter)
 {
-    painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::NoPen));
+    painter->setPen(selected ? QPen(Qt::white, 2) : QPen(Qt::black, 1));
     painter->setBrush(color);
     painter->drawEllipse(QPoint(x, y), radius, radius);
     if (selected)
@@ -242,7 +255,7 @@ bool Circle::validateCoord(int iX, int iY)
     return success;
 }
 
-void Circle::relativeResize(int iSize)
+void Circle::resizeRelative(int iSize)
 {
     if (radius + iSize < 5)
         radius = 5;
@@ -282,6 +295,16 @@ void Circle::load(QString &text)
         color = colorMatch.captured(1);
 }
 
+Circle* Circle::clone()
+{
+    return new Circle(*this);
+}
+
+int Circle::getSize()
+{
+    return radius;
+}
+
 Square::Square()
 {
 
@@ -308,7 +331,7 @@ bool Square::isContaints(int iX, int iY)
 
 void Square::draw(QPainter *painter)
 {
-    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::NoPen));
+    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::black, 1));
     painter->setBrush(color);
     painter->drawRect(x-lenght, y-lenght, lenght*2, lenght*2);
     if (selected)
@@ -319,7 +342,7 @@ void Square::draw(QPainter *painter)
     }
 }
 
-void Square::relativeResize(int iSize)
+void Square::resizeRelative(int iSize)
 {
     if (lenght + iSize < 5)
         lenght = 5;
@@ -392,6 +415,16 @@ void Square::load(QString &text)
         color = colorMatch.captured(1);
 }
 
+Square* Square::clone()
+{
+    return new Square(*this);
+}
+
+int Square::getSize()
+{
+    return lenght;
+}
+
 Triangle::Triangle()
 {
 
@@ -421,7 +454,7 @@ void Triangle::draw(QPainter *painter)
 {
     QPolygon triangle;
     triangle << QPoint(x, y - h) << QPoint(x - h, y + h) << QPoint(x + h, y + h);
-    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::NoPen));
+    painter->setPen(selected ? QPen(Qt::white, 2, Qt::DashLine) : QPen(Qt::black, 1));
     painter->setBrush(color);
     painter->drawPolygon(triangle);
     if (selected)
@@ -435,7 +468,7 @@ void Triangle::draw(QPainter *painter)
     }
 }
 
-void Triangle::relativeResize(int iH)
+void Triangle::resizeRelative(int iH)
 {
     if (h + iH < 10)
         h = 10;
@@ -506,4 +539,25 @@ void Triangle::load(QString &text)
         y = yMatch.captured(1).toInt();
     if (colorMatch.hasMatch())
         color = colorMatch.captured(1);
+}
+
+Triangle* Triangle::clone()
+{
+    return new Triangle(*this);
+}
+
+int Triangle::getSize()
+{
+    return h;
+}
+
+Shape* ShapeFactory::create(const QString& type, int x, int y, QColor color, int size)
+{
+    if (type == "Circle")
+        return new Circle(x, y, color, size);
+    if (type == "Square")
+        return new Square(x, y, color, size);
+    if (type == "Triangle")
+        return new Triangle(x, y, color, size);
+    return nullptr;
 }
