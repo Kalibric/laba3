@@ -24,8 +24,8 @@ public:
     void changeSelectedShape(QString iSelectedShape);
     void changeColor(QColor iColor);
     void groupingButtonClick();
-    void select(ShapeType::FilterParams params);
-    void unSelect(ShapeType::FilterParams params);
+    void select(FilterShape params);
+    void unSelect(FilterShape params);
     void saveButton();
     void loadButton();
 
@@ -55,7 +55,7 @@ private:
     bool isSelectEvent = false;
     bool isResizeEvent = false;
     bool isMoveEvent = false;
-    QString currentShapeType = ShapeType::ShapeTypes::CIRCLE;
+    QString currentShapeType = "Circle";
     QColor color = Qt::green;
     QMenu* contextMenu;
     QMenu* changeShapeType;

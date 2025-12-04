@@ -32,6 +32,7 @@ public slots:
     void unGroupingButton();
     void deactivateGroupingButton();
     void loadButtonClick();
+    void updateShapeTypes();
 
 };
 #endif // MAINWINDOW_H

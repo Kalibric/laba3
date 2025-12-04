@@ -7,6 +7,7 @@ class Command
 {
 protected:
     ShapeStorage& storage;
+    int id;
 
 public:
     Command(ShapeStorage &iStorage);
@@ -28,10 +29,9 @@ class RemoveShape: public Command
 {
 private:
     vector<Shape*> shapes;
-    ShapeType::FilterParams params;
 
 public:
-    RemoveShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams);
+    RemoveShape(ShapeStorage &iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
@@ -43,7 +43,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    MoveShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams, int idx, int idy);
+    MoveShape(ShapeStorage &iStorage, FilterShape iParams, int idx, int idy);
     void execute() override;
     void undo() override;
 };
@@ -55,7 +55,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    ResizeShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams, int iSize);
+    ResizeShape(ShapeStorage &iStorage, FilterShape iParams, int iSize);
     void execute() override;
     void undo() override;
 };
@@ -68,7 +68,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    ChangeColorShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams, QColor iBeforeColor, QColor iAfterColor);
+    ChangeColorShape(ShapeStorage &iStorage, FilterShape iParams, QColor iBeforeColor, QColor iAfterColor);
     void execute() override;
     void undo() override;
 };
@@ -77,10 +77,10 @@ class GroupingShape: public Command
 {
 private:
     vector<Shape*> shapes;
-    Shape* group;
+    Shape* group = ShapeFactory::create("GroupShape", 0, 0);
 
 public:
-    GroupingShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams);
+    GroupingShape(ShapeStorage &iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
@@ -91,7 +91,7 @@ private:
     vector<Shape*> groups;
     vector<Shape*> sh;
 public:
-    UnGroupingShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams);
+    UnGroupingShape(ShapeStorage &iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
@@ -99,12 +99,11 @@ public:
 class ChangeShapeType: public Command
 {
 private:
-    vector<Shape*> old;
-    vector<Shape*> now;
+    vector<Shape*> shapes;
     QString newType;
 
 public:
-    ChangeShapeType(ShapeStorage &iStorage, ShapeType::FilterParams iParams, QString newTypeShape);
+    ChangeShapeType(ShapeStorage &iStorage, FilterShape iParams, QString newTypeShape);
     void execute() override;
     void undo() override;
 };

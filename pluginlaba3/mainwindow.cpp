@@ -15,9 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->paintContainer, &PaintWidget::unGroupingButton, this, &MainWindow::unGroupingButton);
     connect(ui->paintContainer, &PaintWidget::deactivateButton, this, &MainWindow::deactivateGroupingButton);
     connect(ui->loadButton, &QAbstractButton::clicked, this, &MainWindow::loadButtonClick);
-    ui->ShapeSelector->addItem("Круг", "Circle");
-    ui->ShapeSelector->addItem("Квадрат", "Square");
-    ui->ShapeSelector->addItem("Триугольник", "Triangle");
 }
 MainWindow::~MainWindow()
 {
@@ -31,8 +28,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::shapeSelector(int index)
 {
-    QString shapeType = ui->ShapeSelector->currentData().toString();
-    ui->paintContainer->changeSelectedShape(shapeType);
+    ui->paintContainer->changeSelectedShape(ui->ShapeSelector->currentText());
 }
 
 void MainWindow::colorSelector()
@@ -77,6 +73,11 @@ void MainWindow::loadButtonClick()
     ui->paintContainer->loadButton();
 }
 
+void MainWindow::updateShapeTypes()
+{
+    for (QString name : ShapeFactory::getNames())
+        ui->ShapeSelector->addItem(name);
+}
 
 // void MainWindow::setGroupingButton(std::string text)
 // {

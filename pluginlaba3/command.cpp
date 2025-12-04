@@ -1,46 +1,48 @@
 #include "command.h"
-
+int idC = 0;
 Command::Command(ShapeStorage &iStorage) : storage(iStorage)
 {
-
+    id = idC++;
 }
 
 AddShape::AddShape(ShapeStorage &iStorage, int x, int y, QColor color, QString type) : Command(iStorage)
 {
     shape = ShapeFactory::create(type, x, y, color);
+    id = idC++;
 }
 
 void AddShape::execute()
 {
-    storage.add(shape);
+    if (shape != nullptr)
+        storage.add(shape->clone());
 }
 
 void AddShape::undo()
 {
-    storage.remove(shape);
+    if (shape != nullptr);
+        storage.remove(shape);
 }
 
-RemoveShape::RemoveShape(ShapeStorage& iStorage, ShapeType::FilterParams iParams) : Command(iStorage), params(iParams)
+RemoveShape::RemoveShape(ShapeStorage& iStorage, FilterShape iParams) : Command(iStorage)
 {
-    vector<Shape*> iShapes = storage.clone(params);
-    for (Shape* shape : iShapes)
-        shapes.push_back(shape);
+    shapes = storage.clone(iParams);
 }
 
 void RemoveShape::execute()
 {
-    storage.remove(params);
+    for (Shape* shape : shapes)
+        storage.remove(shape);
 }
 
 void RemoveShape::undo()
 {
     for (Shape* shape : shapes)
-        storage.add(shape);
+        storage.add(shape->clone());
 }
 
-MoveShape::MoveShape(ShapeStorage& iStorage, ShapeType::FilterParams iParams, int idx, int idy) : Command(iStorage), dx(idx), dy(idy)
+MoveShape::MoveShape(ShapeStorage& iStorage, FilterShape iParams, int idx, int idy) : Command(iStorage), dx(idx), dy(idy)
 {
-    shapes = storage.get(iParams);
+    shapes = storage.clone(iParams);
 }
 
 void MoveShape::execute()
@@ -55,9 +57,9 @@ void MoveShape::undo()
         storage.moveRelative(shape, -dx, -dy);
 }
 
-ResizeShape::ResizeShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams, int iSize) : Command(iStorage), dSize(iSize)
+ResizeShape::ResizeShape(ShapeStorage &iStorage, FilterShape iParams, int iSize) : Command(iStorage), dSize(iSize)
 {
-    shapes = storage.get(iParams);
+    shapes = storage.clone(iParams);
 }
 
 void ResizeShape::execute()
@@ -72,9 +74,9 @@ void ResizeShape::undo()
         storage.resizeRelative(shape, -dSize);
 }
 
-ChangeColorShape::ChangeColorShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams, QColor iBeforeColor, QColor iAfterColor) : Command(iStorage), beforeColor(iBeforeColor), afterColor(iAfterColor)
+ChangeColorShape::ChangeColorShape(ShapeStorage &iStorage, FilterShape iParams, QColor iBeforeColor, QColor iAfterColor) : Command(iStorage), beforeColor(iBeforeColor), afterColor(iAfterColor)
 {
-    shapes = storage.get(iParams);
+    shapes = storage.clone(iParams);
 }
 
 void ChangeColorShape::execute()
@@ -89,31 +91,30 @@ void ChangeColorShape::undo()
         storage.changeColor(shape, beforeColor);
 }
 
-GroupingShape::GroupingShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams) : Command(iStorage)
+GroupingShape::GroupingShape(ShapeStorage &iStorage, FilterShape iParams) : Command(iStorage)
 {
-    shapes = storage.get(iParams);
-    group = new GroupShape();
+    shapes = storage.clone(iParams);
     for (Shape* shape : shapes)
-        group->add(shape);
+        group->add(shape->clone());
 }
 
 void GroupingShape::execute()
 {
+    storage.add(group->clone());
     for (Shape* shape : shapes)
         storage.remove(shape);
-    storage.add(group);
 }
 
 void GroupingShape::undo()
 {
     storage.remove(group);
     for (Shape* shape : shapes)
-        storage.add(shape);
+        storage.add(shape->clone());
 }
 
-UnGroupingShape::UnGroupingShape(ShapeStorage &iStorage, ShapeType::FilterParams iParams) : Command(iStorage)
+UnGroupingShape::UnGroupingShape(ShapeStorage &iStorage, FilterShape iParams) : Command(iStorage)
 {
-    groups = storage.get(iParams);
+    groups = storage.clone(iParams);
     for (Shape* group : groups)
     {
         Shape* cloneGroup = group->clone();
@@ -128,41 +129,34 @@ void UnGroupingShape::execute()
     for (Shape* group : groups)
         storage.remove(group);
     for (Shape* shape : sh)
-        storage.add(shape);
+        storage.add(shape->clone());
 }
 
 void UnGroupingShape::undo()
 {
     for (Shape* group : groups)
-        storage.add(group);
+        storage.add(group->clone());
     for (Shape* shape : sh)
         storage.remove(shape);
 }
 
-ChangeShapeType::ChangeShapeType(ShapeStorage &iStorage, ShapeType::FilterParams iParams, QString newTypeShape) : Command(iStorage), newType(newTypeShape)
+ChangeShapeType::ChangeShapeType(ShapeStorage &iStorage, FilterShape iParams, QString newTypeShape) : Command(iStorage), newType(newTypeShape)
 {
-    old = storage.clone(iParams);
-    now = storage.get(iParams);
+    shapes = storage.clone(iParams);
 }
 
 void ChangeShapeType::execute()
 {
-    for (Shape* shape : now)
-    {
+    for (Shape* shape : shapes)
         storage.changeShapeType(shape, newType);
-    }
 }
 
 void ChangeShapeType::undo()
 {
-    for (Shape* shape : old)
-    {
-        storage.add(shape);
-    }
-    for (Shape* shape : now)
-    {
+    for (Shape* shape : shapes)
         storage.remove(shape);
-    }
+    for (Shape* shape : shapes)
+        storage.add(shape->clone());
 }
 
 void CommandManager::clearStack(stack<Command*>& stack)
