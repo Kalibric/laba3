@@ -14,6 +14,8 @@
 #include "command.h"
 #include <QColorDialog>
 #include <QFileDialog>
+#include "shapetree.h"
+#include "mainwindow.h"
 
 class PaintWidget : public QWidget
 {
@@ -32,6 +34,7 @@ public:
     void setGroupingEvent(QAction *newGroupingEvent);
     void resetGroupingEvent();
     void validateGroupingButton();
+    void setStorage(ShapeStorage *iStorage);
 
 signals:
     void groupingButton();
@@ -49,7 +52,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    ShapeStorage storage;
+    ShapeStorage *storage = new ShapeStorage();
     QPoint lastPosition;
     QPoint lastPositionBefore;
     bool isSelectEvent = false;
@@ -72,7 +75,6 @@ private:
     int resize = 0;
 
 
-    // Q_PROPERTY(QAction *menuGroupingEvent READ menuGroupingEvent WRITE setGroupingEvent RESET resetGroupingEvent NOTIFY groupingEventChanged FINAL)
 
 private slots:
     void removeAction();
@@ -84,6 +86,7 @@ private slots:
     void changeShapeTypeToTriangle();
 
     void selectAllAction();
+    void selectUpdated();
 
 };
 

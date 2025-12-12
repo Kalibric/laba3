@@ -7,6 +7,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->paintContainer->setStorage(storage);
+    ui->ShapeTreeView->setStorage(storage);
+
     connect(ui->ShapeSelector, &QComboBox::currentIndexChanged, this, &MainWindow::shapeSelector);
     connect(ui->ColorSelector, &QAbstractButton::clicked, this, &MainWindow::colorSelector);
     connect(ui->GroupingButton, &QAbstractButton::clicked, this, &MainWindow::grouping);

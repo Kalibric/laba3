@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QKeyEvent>
 #include <QColorDialog>
+#include "shapestorage.h"
+#include "shape.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,16 +18,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    Ui::MainWindow *ui;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
     void keyPressEvent(QKeyEvent *event) override;
     void shapeSelector(int index);
     void colorSelector();
     void grouping();
     void saveButtonClick();
+    ShapeStorage *storage = new ShapeStorage();
 
 public slots:
     void groupingButton();

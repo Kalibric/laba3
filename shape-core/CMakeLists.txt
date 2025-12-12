@@ -17,6 +17,9 @@ add_library(shape-core SHARED
     shapeloader.h shapeloader.cpp
     pluginloader.h pluginloader.cpp
 
+
+
+
 )
 
 target_compile_definitions(shape-core PRIVATE SHAPE_CORE_LIBRARY)

@@ -162,3 +162,8 @@ void GroupShape::load(QTextStream &file, QString &line)
     storage.clear();
     storage = ShapeLoader::load(file);
 }
+
+string GroupShape::type()
+{
+    return "GroupShape";
+}

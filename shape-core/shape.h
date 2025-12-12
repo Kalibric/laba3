@@ -6,6 +6,7 @@
 #include <vector>
 #include <QRegularExpression>
 #include "shape_global.h"
+
 using namespace std;
 class SHAPE_CORE_EXPORT Shape
 {
@@ -26,10 +27,11 @@ public:
     virtual void unSelect();
     virtual bool isSelect();
     virtual void moveRelative(int iX, int iY);
-    virtual void saveInFile(QTextStream &out, int level) {}
-    virtual void load(QTextStream &file, QString &text) {}
+    virtual void saveInFile(QTextStream &out, int level) = 0;
+    virtual void load(QTextStream &file, QString &text) = 0;
     virtual Shape* clone() = 0;
     virtual int getSize() = 0;
+    virtual string type();
     int getX() { return x; }
     int getY() { return y; }
     QColor getColor() { return color; }

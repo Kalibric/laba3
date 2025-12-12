@@ -123,3 +123,8 @@ int Circle::getSize()
 {
     return radius;
 }
+
+string Circle::type()
+{
+    return "Circle";
+}

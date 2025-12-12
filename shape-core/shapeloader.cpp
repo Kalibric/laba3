@@ -16,8 +16,11 @@ vector<Shape*> ShapeLoader::load(QTextStream &file)
                 if (shapeType.name == typeShape)
                 {
                     Shape* shape = ShapeFactory::create(shapeType.name, 0, 0);
-                    shape->load(file, line);
-                    result.push_back(shape);
+                    if (shape != nullptr)
+                    {
+                        shape->load(file, line);
+                        result.push_back(shape);
+                    }
                 }
                 else if (typeShape[0] == "/")
                     return result;

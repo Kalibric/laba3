@@ -21,6 +21,7 @@ public:
     void load(QTextStream &file, QString &text) override;
     Triangle* clone() override;
     int getSize() override;
+    string type() override;
 
 protected:
     int h = 50;

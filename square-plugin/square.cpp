@@ -120,3 +120,8 @@ int Square::getSize()
 {
     return lenght;
 }
+
+string Square::type()
+{
+    return "Square";
+}

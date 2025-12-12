@@ -1,5 +1,4 @@
 #include "shapestorage.h"
-using namespace std;
 
 vector<Shape*> ShapeStorage::clone(FilterShape params)
 {
@@ -7,6 +6,7 @@ vector<Shape*> ShapeStorage::clone(FilterShape params)
     for (Shape* shape : ShapeStorage::get(params))
         result.push_back(shape->clone());
     return result;
+
 }
 
 vector<Shape*> ShapeStorage::get(FilterShape params)
@@ -68,10 +68,23 @@ vector<Shape*> ShapeStorage::get(FilterShape params)
     return result;
 }
 
-void ShapeStorage::add(Shape *iShape)
+void ShapeStorage::add(Shape *iShape, bool isEmit)
 {
     iShape->changeCanvasSize(canvasSizeX, canvasSizeY);
     storage.push_back(iShape);
+    if (isEmit)
+        emit storageUpdated();
+}
+
+void ShapeStorage::add(vector<Shape*> shapes, bool isEmit)
+{
+    for (Shape *shape : shapes)
+    {
+        shape->changeCanvasSize(canvasSizeX, canvasSizeY);
+        storage.push_back(shape);
+    }
+    if (isEmit)
+        emit storageUpdated();
 }
 
 void ShapeStorage::draw(FilterShape type, QPainter *painter)
@@ -83,44 +96,118 @@ void ShapeStorage::draw(FilterShape type, QPainter *painter)
 
 bool ShapeStorage::select(FilterShape params)
 {
+    bool success = false;
     vector<Shape*> result = get(params);
     for (Shape *shape : result)
-        shape->select();
-
-    return result.size() > 0;
+        if (!shape->isSelect())
+        {
+            shape->select();
+            success = true;
+        }
+    if (success)
+        emit selectUpdated();
+    return success;
 }
 
 bool ShapeStorage::unSelect(FilterShape params)
 {
+    bool success = false;
     vector<Shape*> result = get(params);
     for (Shape *shape : result)
-        shape->unSelect();
-    return result.size() > 0;
+        if (shape->isSelect())
+        {
+            shape->unSelect();
+            success = true;
+        }
+    if (success)
+        emit selectUpdated();
+
+    return success;
 }
 
-void ShapeStorage::remove(FilterShape params)
+bool ShapeStorage::select(Shape *shape)
+{
+    bool success = false;
+    for (size_t i = 0; i < storage.size(); i++)
+        if (storage[i]->getID() == shape->getID())
+        {
+            success = true;
+            storage[i]->select();
+            break;
+        }
+    if (success)
+        emit selectUpdated();
+    return success;
+}
+
+bool ShapeStorage::unSelect(Shape *shape)
+{
+    bool success = false;
+    for (size_t i = 0; i < storage.size(); i++)
+        if (storage[i]->getID() == shape->getID())
+        {
+            success = true;
+            storage[i]->unSelect();
+            break;
+        }
+    if (success)
+        emit selectUpdated();
+    return success;
+}
+
+void ShapeStorage::remove(FilterShape params, bool isEmit)
 {
     vector<Shape*> result = get(params);
+    bool success = false;
     for (Shape* shape : result)
     {
         delete shape;
         auto it = std::find(storage.begin(), storage.end(), shape);
         if (it != storage.end())
+        {
+            success = true;
             storage.erase(it);
+        }
     }
+    if (success && isEmit)
+        emit storageUpdated();
 }
 
-void ShapeStorage::remove(Shape *iShape)
+void ShapeStorage::remove(Shape *iShape, bool isEmit)
 {
     if (iShape == nullptr)
         return;
+
+    bool success = false;
     for (size_t i = 0; i < storage.size(); i++)
         if (storage[i]->getID() == iShape->getID())
         {
             delete storage[i];
             storage.erase(storage.begin() + i);
-            return;
+            success = true;
+            break;
         }
+
+    if (success && isEmit)
+        emit storageUpdated();
+}
+
+void ShapeStorage::remove(vector<Shape*> shapes, bool isEmit)
+{
+    bool success = false;
+    for (Shape *shape : shapes)
+    {
+        for (size_t i = 0; i < storage.size(); i++)
+            if (storage[i]->getID() == shape->getID())
+            {
+                success = true;
+                delete storage[i];
+                storage.erase(storage.begin() + i);
+                break;
+            }
+    }
+    if (success && isEmit)
+        emit storageUpdated();
 }
 
 void ShapeStorage::moveRelative(FilterShape params, int x, int y)
@@ -204,6 +291,8 @@ void ShapeStorage::unGroup(FilterShape params)
         auto it = std::remove(storage.begin(), storage.end(), group);
         storage.erase(it, storage.end());
     }
+    if (!result.empty())
+        emit storageUpdated();
 }
 
 int ShapeStorage::count(FilterShape params)
@@ -214,15 +303,41 @@ int ShapeStorage::count(FilterShape params)
 
 void ShapeStorage::changeShapeType(Shape* shape, QString newType)
 {
+    bool success = false;
     for (size_t i = 0; i < storage.size(); ++i)
     {
         if (storage[i]->getID() == shape->getID())
         {
+            success = true;
             storage[i] = ShapeFactory::changeType(storage[i], newType);
             storage[i]->changeCanvasSize(canvasSizeX, canvasSizeY);
             storage[i]->select();
+            break;
         }
     }
+    if (success)
+        emit storageUpdated();
+}
+
+void ShapeStorage::changeShapeType(vector<Shape*> shapes, QString newType)
+{
+    bool success = false;
+    for (Shape* shape : shapes)
+    {
+        for (size_t i = 0; i < storage.size(); ++i)
+        {
+            if (storage[i]->getID() == shape->getID())
+            {
+                success = true;
+                storage[i] = ShapeFactory::changeType(storage[i], newType);
+                storage[i]->changeCanvasSize(canvasSizeX, canvasSizeY);
+                storage[i]->select();
+                break;
+            }
+        }
+    }
+    if (success)
+        emit storageUpdated();
 }
 
 void ShapeStorage::saveInFile(QString iFile)

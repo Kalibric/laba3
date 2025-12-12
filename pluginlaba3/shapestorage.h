@@ -9,7 +9,7 @@
 #include <QRegularExpression>
 #include "shapefactory.h"
 #include "shapeloader.h"
-
+using namespace std;
 enum class TypeShape {
     ALL = 0,
     SELECTED = 1,
@@ -19,7 +19,7 @@ enum class TypeShape {
     TO_COORDS_UNSELECTED = 5,
     TO_COORDS_SELECTED = 6,
     RESIZE_AREA_SELECTED = 7,
-    SELECTED_IS_GROUP = 8
+    SELECTED_IS_GROUP = 8,
 };
 struct FilterShape
 {
@@ -35,18 +35,23 @@ struct FilterShape
 
 using namespace std;
 
-class ShapeStorage
+class ShapeStorage : public QObject
 {
+    Q_OBJECT
 public:
     Shape* createShape(int x, int y, QColor color = Qt::green);
     vector<Shape*> get(FilterShape type);
     vector<Shape*> clone(FilterShape type);
-    void add(Shape *iShape);
+    void add(Shape *iShape, bool isEmit = true);
+    void add(vector<Shape*> shapes, bool isEmit = true);
     void draw(FilterShape params, QPainter *painter);
     bool select(FilterShape params);
     bool unSelect(FilterShape params);
-    void remove(FilterShape params);
-    void remove(Shape* iShape);
+    bool select(Shape* shape);
+    bool unSelect(Shape* shape);
+    void remove(FilterShape params, bool isEmit = true);
+    void remove(Shape* iShape, bool isEmit = true);
+    void remove(vector<Shape*> shapes, bool isEmit = true);
     void moveRelative(FilterShape params, int x, int y);
     void moveRelative(Shape* shape, int x, int y);
     void resizeRelative(FilterShape params, int iSize);
@@ -59,13 +64,17 @@ public:
     void unGroup(FilterShape params);
     int count(FilterShape params);
     void changeShapeType(Shape* shape, QString newType);
+    void changeShapeType(vector<Shape*> shapes, QString newType);
 
     void saveInFile(QString iFile);
     void load(QString iFile);
 
+signals:
+    void storageUpdated();
+    void selectUpdated();
+
 private:
     vector<Shape*> storage;
-    vector<Shape*> createShapes(QTextStream &in);
     int canvasSizeX = 0;
     int canvasSizeY = 0;
 };

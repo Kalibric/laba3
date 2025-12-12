@@ -100,16 +100,18 @@ GroupingShape::GroupingShape(ShapeStorage &iStorage, FilterShape iParams) : Comm
 
 void GroupingShape::execute()
 {
-    storage.add(group->clone());
-    for (Shape* shape : shapes)
-        storage.remove(shape);
+    storage.add(group->clone(), false);
+    storage.remove(shapes);
 }
 
 void GroupingShape::undo()
 {
-    storage.remove(group);
+    vector<Shape*> clone;
+    storage.remove(group, false);
     for (Shape* shape : shapes)
-        storage.add(shape->clone());
+        clone.push_back(shape->clone());
+
+    storage.add(clone);
 }
 
 UnGroupingShape::UnGroupingShape(ShapeStorage &iStorage, FilterShape iParams) : Command(iStorage)
@@ -126,18 +128,20 @@ UnGroupingShape::UnGroupingShape(ShapeStorage &iStorage, FilterShape iParams) : 
 
 void UnGroupingShape::execute()
 {
-    for (Shape* group : groups)
-        storage.remove(group);
+    vector<Shape*> shapes;
     for (Shape* shape : sh)
-        storage.add(shape->clone());
-}
+        shapes.push_back(shape->clone());
+    storage.remove(groups, false);
+    storage.add(shapes);
+    }
 
 void UnGroupingShape::undo()
 {
+    vector<Shape*> temp;
     for (Shape* group : groups)
-        storage.add(group->clone());
-    for (Shape* shape : sh)
-        storage.remove(shape);
+        temp.push_back(group->clone());
+    storage.add(temp, false);
+    storage.remove(sh);
 }
 
 ChangeShapeType::ChangeShapeType(ShapeStorage &iStorage, FilterShape iParams, QString newTypeShape) : Command(iStorage), newType(newTypeShape)
@@ -147,16 +151,17 @@ ChangeShapeType::ChangeShapeType(ShapeStorage &iStorage, FilterShape iParams, QS
 
 void ChangeShapeType::execute()
 {
-    for (Shape* shape : shapes)
-        storage.changeShapeType(shape, newType);
+    storage.changeShapeType(shapes, newType);
 }
 
 void ChangeShapeType::undo()
 {
+    vector<Shape*> temp;
     for (Shape* shape : shapes)
-        storage.remove(shape);
-    for (Shape* shape : shapes)
-        storage.add(shape->clone());
+        temp.push_back(shape->clone());
+
+    storage.remove(shapes, false);
+    storage.add(temp);
 }
 
 void CommandManager::clearStack(stack<Command*>& stack)

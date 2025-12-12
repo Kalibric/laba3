@@ -126,3 +126,8 @@ int Triangle::getSize()
 {
     return h;
 }
+
+string Triangle::type()
+{
+    return "Triangle";
+}

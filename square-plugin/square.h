@@ -21,6 +21,7 @@ public:
     void load(QTextStream &file, QString &text) override;
     Square* clone() override;
     int getSize() override;
+    string type() override;
 
 protected:
     int lenght = 50;

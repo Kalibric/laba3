@@ -77,6 +77,12 @@ void Shape::moveRelative(int iX, int iY)
         y += iY;
     }
 }
+
+string Shape::type()
+{
+    return "Shape";
+}
+
 void Shape::changeColor(QColor iColor)
 {
     color = iColor;

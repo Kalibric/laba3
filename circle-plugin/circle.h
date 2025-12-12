@@ -20,6 +20,7 @@ public:
     void load(QTextStream &file, QString &text) override;
     Circle* clone() override;
     int getSize() override;
+    string type() override;
 
 protected:
     int radius = 50;

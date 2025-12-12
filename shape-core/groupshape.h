@@ -8,12 +8,6 @@
 
 class SHAPE_CORE_EXPORT GroupShape : public Shape
 {
-private:
-    vector<Shape*> storage;
-    struct Register {
-        Register();
-    };
-    static Register reg;
 
 public:
     GroupShape();
@@ -37,11 +31,13 @@ public:
     int getSize() override {return 0;}
     void changeTypeTo(QString newType);
     void load(QTextStream &file, QString &line) override;
+    string type() override;
 
     // Composite
     bool isGroup() override;
     void add(Shape* shape) override;
     vector<Shape*> unGrouping() override;
+    vector<Shape*> storage;
 };
 
 #endif // GROUPSHAPE_H
