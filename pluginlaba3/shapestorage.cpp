@@ -64,7 +64,6 @@ vector<Shape*> ShapeStorage::get(FilterShape params)
             if (shape->isGroup() && shape->isSelect())
                 result.push_back(shape);
     }
-
     return result;
 }
 
@@ -165,6 +164,7 @@ void ShapeStorage::remove(FilterShape params, bool isEmit)
         auto it = std::find(storage.begin(), storage.end(), shape);
         if (it != storage.end())
         {
+            emit shapeDeletedBefore(shape);
             success = true;
             storage.erase(it);
         }
@@ -182,6 +182,7 @@ void ShapeStorage::remove(Shape *iShape, bool isEmit)
     for (size_t i = 0; i < storage.size(); i++)
         if (storage[i]->getID() == iShape->getID())
         {
+            emit shapeDeletedBefore(storage[i]);
             delete storage[i];
             storage.erase(storage.begin() + i);
             success = true;
@@ -200,6 +201,7 @@ void ShapeStorage::remove(vector<Shape*> shapes, bool isEmit)
         for (size_t i = 0; i < storage.size(); i++)
             if (storage[i]->getID() == shape->getID())
             {
+                emit shapeDeletedBefore(storage[i]);
                 success = true;
                 delete storage[i];
                 storage.erase(storage.begin() + i);

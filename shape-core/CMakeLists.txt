@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.16)
-
 project(shape-core LANGUAGES CXX)
 
 # Ищем необходимые модули Qt6
@@ -16,9 +15,6 @@ add_library(shape-core SHARED
     IShapePlugin.h
     shapeloader.h shapeloader.cpp
     pluginloader.h pluginloader.cpp
-
-
-
 
 )
 

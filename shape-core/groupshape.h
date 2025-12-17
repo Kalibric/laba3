@@ -28,16 +28,28 @@ public:
     void moveRelative(int iX, int iY) override;
     void saveInFile(QTextStream &out, int level) override;
     GroupShape* clone() override;
-    int getSize() override {return 0;}
+    int getSize() override;
     void changeTypeTo(QString newType);
     void load(QTextStream &file, QString &line) override;
-    string type() override;
+    std::string type() override;
+    virtual int getSizeX();
+    virtual int getSizeY();
 
     // Composite
     bool isGroup() override;
     void add(Shape* shape) override;
-    vector<Shape*> unGrouping() override;
-    vector<Shape*> storage;
+    std::vector<Shape*> unGrouping() override;
+    std::vector<Shape*> storage;
+
+protected:
+    int minX = 0;
+    int minY = 0;
+    int maxX = 0;
+    int maxY = 0;
+
+private:
+    void updateBounds();
+    void updateCenter();
 };
 
 #endif // GROUPSHAPE_H

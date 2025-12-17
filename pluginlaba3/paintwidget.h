@@ -16,6 +16,9 @@
 #include <QFileDialog>
 #include "shapetree.h"
 #include "mainwindow.h"
+#include "arrowstorage.h"
+#include "uniarrow.h"
+#include "biarrow.h"
 
 class PaintWidget : public QWidget
 {
@@ -43,6 +46,9 @@ signals:
 
     void groupingEventChanged();
 
+    void arrowButtonEnable();
+    void arrowButtonDisable();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
@@ -53,6 +59,7 @@ protected:
 
 private:
     ShapeStorage *storage = new ShapeStorage();
+    ArrowStorage *arrowStorage = new ArrowStorage(storage);
     QPoint lastPosition;
     QPoint lastPositionBefore;
     bool isSelectEvent = false;
@@ -72,9 +79,13 @@ private:
     QAction* squareType;
     QAction* triangleType;
     CommandManager manager;
+    Shape *firstSelected;
+    vector<Shape*> copyShapes;
     int resize = 0;
 
-
+public slots:
+    void uniArrowButton();
+    void biArrowButton();
 
 private slots:
     void removeAction();

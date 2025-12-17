@@ -8,8 +8,8 @@
 class SHAPE_CORE_EXPORT ShapeLoader
 {
 public:
-    static vector<Shape*> load(QTextStream &file);
-    static void save(QTextStream &file, vector<Shape*> shapes, int level = 0);
+    static std::vector<Shape*> load(QTextStream &file);
+    static void save(QTextStream &file, std::vector<Shape*> shapes, int level = 0);
 };
 
 #endif // SHAPELOADER_H

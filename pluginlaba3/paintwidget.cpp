@@ -32,6 +32,7 @@ void PaintWidget::paintEvent(QPaintEvent *event)
     painter->setRenderHint(QPainter::Antialiasing);
 
     storage->draw(TypeShape::ALL, painter);
+    arrowStorage->draw(painter);
     painter->end();
 }
 
@@ -68,9 +69,9 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         if (isMoveEvent)
-            manager.add(new MoveShape(*storage, TypeShape::SELECTED, lastPosition.x() - lastPositionBefore.x(), lastPosition.y() - lastPositionBefore.y()), false);
+            manager.add(new MoveShape(storage, TypeShape::SELECTED, lastPosition.x() - lastPositionBefore.x(), lastPosition.y() - lastPositionBefore.y()), false);
         else if (isResizeEvent)
-            manager.add(new ResizeShape(*storage, TypeShape::SELECTED, resize), false);
+            manager.add(new ResizeShape(storage, TypeShape::SELECTED, resize), false);
         resize = 0;
         isResizeEvent = false;
         isMoveEvent = false;
@@ -90,7 +91,7 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
                 else
                 {
                     unSelect(TypeShape::ALL);
-                    manager.add(new AddShape(*storage, x, y, color, currentShapeType));
+                    manager.add(new AddShape(storage, x, y, color, currentShapeType));
                 }
                 update();
             }
@@ -179,7 +180,7 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
     bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
     if (event->key() == Qt::Key_Delete)
     {
-        manager.add(new RemoveShape(*storage, TypeShape::SELECTED));
+        manager.add(new RemoveShape(storage, TypeShape::SELECTED));
         update();
     }
     else if (event->key() == Qt::Key_A && ctrlPressed)
@@ -229,6 +230,25 @@ void PaintWidget::keyPressEvent(QKeyEvent *event)
         validateGroupingButton();
         update();
     }
+    else if (event->key() == Qt::Key_C && ctrlPressed)
+    {
+        copyShapes = storage->clone(TypeShape::SELECTED);
+    }
+    else if (event->key() == Qt::Key_V && ctrlPressed)
+    {
+        for (Shape* shape : copyShapes)
+        {
+            if (shape->isGroup())
+            {
+                manager.add(new AddShape(storage, shape, false));
+                vector<Shape*> shapes = storage->get(TypeShape::ALL);
+                if (shapes.size() > 0)
+                    shapes[shapes.size() - 1]->moveRelative(30, 30);
+            }
+            else
+                manager.add(new AddShape(storage, shape->getX()+30, shape->getY()+30, shape->getColor(), QString::fromStdString(shape->type())));
+        }
+    }
 }
 
 void PaintWidget::validateGroupingButton()
@@ -245,7 +265,10 @@ void PaintWidget::validateGroupingButton()
 void PaintWidget::setStorage(ShapeStorage *iStorage)
 {
     disconnect(storage, &ShapeStorage::selectUpdated, this, &PaintWidget::selectUpdated);
+    delete arrowStorage;
+    delete storage;
     storage = iStorage;
+    arrowStorage = new ArrowStorage(storage);
     connect(storage, &ShapeStorage::selectUpdated, this, &PaintWidget::selectUpdated);
 }
 
@@ -257,7 +280,7 @@ void PaintWidget::changeSelectedShape(QString iSelectedShape)
 void PaintWidget::changeColor(QColor iColor)
 {
     if (storage->isExists(TypeShape::SELECTED))
-        manager.add(new ChangeColorShape(*storage, TypeShape::SELECTED, color, iColor));
+        manager.add(new ChangeColorShape(storage, TypeShape::SELECTED, color, iColor));
     color = iColor;
 }
 
@@ -265,12 +288,12 @@ void PaintWidget::groupingButtonClick()
 {
     if (storage->count(TypeShape::SELECTED_IS_GROUP) == 1 && storage->count(TypeShape::SELECTED) == 1)
     {
-        manager.add(new UnGroupingShape(*storage, TypeShape::SELECTED));
+        manager.add(new UnGroupingShape(storage, TypeShape::SELECTED));
         emit groupingButton();
     }
     else if (storage->count(TypeShape::SELECTED) > 1)
     {
-        manager.add(new GroupingShape(*storage, TypeShape::SELECTED));
+        manager.add(new GroupingShape(storage, TypeShape::SELECTED));
         emit unGroupingButton();
     }
     update();
@@ -279,10 +302,23 @@ void PaintWidget::groupingButtonClick()
 void PaintWidget::select(FilterShape params)
 {
     storage->select(params);
-    if (storage->count(TypeShape::SELECTED_IS_GROUP) == 1 && storage->count(TypeShape::SELECTED) == 1)
+    vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
+    if (storage->count(TypeShape::SELECTED_IS_GROUP) == 1 && shapes.size() == 1)
+    {
         emit unGroupingButton();
-    else if (storage->count(TypeShape::SELECTED) > 1)
+        emit arrowButtonDisable();
+    }
+    else if (shapes.size() > 1)
         emit groupingButton();
+    if (shapes.size() == 1)
+    {
+        firstSelected = shapes[0];
+    }
+    if (shapes.size() == 2 && !arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
+        emit arrowButtonEnable();
+    else
+        emit arrowButtonDisable();
+
 }
 
 void PaintWidget::unSelect(FilterShape params)
@@ -293,7 +329,10 @@ void PaintWidget::unSelect(FilterShape params)
     else if (storage->count(TypeShape::SELECTED) > 1)
         emit groupingButton();
     else
+    {
         emit deactivateButton();
+        emit arrowButtonDisable();
+    }
 }
 
 void PaintWidget::saveButton()
@@ -319,17 +358,17 @@ void PaintWidget::setColorAction()
 {
     QColor newColor = QColorDialog::getColor(Qt::green, this, "");
     if (newColor.isValid())
-        manager.add(new ChangeColorShape(*storage, TypeShape::SELECTED, color, newColor));
+        manager.add(new ChangeColorShape(storage, TypeShape::SELECTED, color, newColor));
 }
 
 void PaintWidget::groupingAction()
 {
-    manager.add(new GroupingShape(*storage, TypeShape::SELECTED));
+    manager.add(new GroupingShape(storage, TypeShape::SELECTED));
 }
 
 void PaintWidget::unGroupingAction()
 {
-    manager.add(new UnGroupingShape(*storage, TypeShape::SELECTED));
+    manager.add(new UnGroupingShape(storage, TypeShape::SELECTED));
 }
 
 void PaintWidget::selectAllAction()
@@ -339,23 +378,49 @@ void PaintWidget::selectAllAction()
 
 void PaintWidget::changeShapeTypeToCircle()
 {
-    manager.add(new ChangeShapeType(*storage, TypeShape::SELECTED, "Circle"));
+    manager.add(new ChangeShapeType(storage, TypeShape::SELECTED, "Circle"));
     update();
 }
 
 void PaintWidget::changeShapeTypeToSquare()
 {
-    manager.add(new ChangeShapeType(*storage, TypeShape::SELECTED, "Square"));
+    manager.add(new ChangeShapeType(storage, TypeShape::SELECTED, "Square"));
     update();
 }
 
 void PaintWidget::changeShapeTypeToTriangle()
 {
-    manager.add(new ChangeShapeType(*storage, TypeShape::SELECTED, "Triangle"));
+    manager.add(new ChangeShapeType(storage, TypeShape::SELECTED, "Triangle"));
     update();
 }
 
 void PaintWidget::selectUpdated()
 {
     update();
+}
+
+void PaintWidget::uniArrowButton()
+{
+    vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
+    if (shapes.size() > 1)
+    {
+        if (!arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
+        {
+            arrowStorage->addArrow(new UniArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
+            update();
+        }
+    }
+}
+
+void PaintWidget::biArrowButton()
+{
+    vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
+    if (shapes.size() > 1)
+    {
+        if (!arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
+        {
+            arrowStorage->addArrow(new BiArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
+            update();
+        }
+    }
 }

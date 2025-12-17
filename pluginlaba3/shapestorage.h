@@ -20,6 +20,7 @@ enum class TypeShape {
     TO_COORDS_SELECTED = 6,
     RESIZE_AREA_SELECTED = 7,
     SELECTED_IS_GROUP = 8,
+    LAST = 9
 };
 struct FilterShape
 {
@@ -72,6 +73,7 @@ public:
 signals:
     void storageUpdated();
     void selectUpdated();
+    void shapeDeletedBefore(Shape *shape);
 
 private:
     vector<Shape*> storage;

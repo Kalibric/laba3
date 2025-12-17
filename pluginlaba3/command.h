@@ -2,15 +2,20 @@
 #define COMMAND_H
 #include <stack>
 #include "shapestorage.h"
+// #include "arrowstorage.h"
+// #include "uniarrow.h"
+// #include "biarrow.h"
 using namespace std;
 class Command
 {
 protected:
-    ShapeStorage& storage;
+    ShapeStorage* storage;
+    // ArrowStorage* arrows;
     int id;
 
 public:
-    Command(ShapeStorage &iStorage);
+    Command(ShapeStorage *iStorage);
+    // Command(ArrowStorage *iArrows);
     virtual void execute() = 0;
     virtual void undo() = 0;
 };
@@ -20,7 +25,8 @@ class AddShape: public Command
 private:
     Shape* shape;
 public:
-    AddShape(ShapeStorage &iStorage, int x, int y, QColor color, QString type);
+    AddShape(ShapeStorage *iStorage, int x, int y, QColor color, QString type);
+    AddShape(ShapeStorage *iStorage, Shape *shape, bool isSaveID = true);
     void execute() override;
     void undo() override;
 };
@@ -31,7 +37,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    RemoveShape(ShapeStorage &iStorage, FilterShape iParams);
+    RemoveShape(ShapeStorage *iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
@@ -43,7 +49,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    MoveShape(ShapeStorage &iStorage, FilterShape iParams, int idx, int idy);
+    MoveShape(ShapeStorage *iStorage, FilterShape iParams, int idx, int idy);
     void execute() override;
     void undo() override;
 };
@@ -55,7 +61,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    ResizeShape(ShapeStorage &iStorage, FilterShape iParams, int iSize);
+    ResizeShape(ShapeStorage *iStorage, FilterShape iParams, int iSize);
     void execute() override;
     void undo() override;
 };
@@ -68,7 +74,7 @@ private:
     vector<Shape*> shapes;
 
 public:
-    ChangeColorShape(ShapeStorage &iStorage, FilterShape iParams, QColor iBeforeColor, QColor iAfterColor);
+    ChangeColorShape(ShapeStorage *iStorage, FilterShape iParams, QColor iBeforeColor, QColor iAfterColor);
     void execute() override;
     void undo() override;
 };
@@ -80,7 +86,7 @@ private:
     Shape* group = ShapeFactory::create("GroupShape", 0, 0);
 
 public:
-    GroupingShape(ShapeStorage &iStorage, FilterShape iParams);
+    GroupingShape(ShapeStorage *iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
@@ -91,10 +97,21 @@ private:
     vector<Shape*> groups;
     vector<Shape*> sh;
 public:
-    UnGroupingShape(ShapeStorage &iStorage, FilterShape iParams);
+    UnGroupingShape(ShapeStorage *iStorage, FilterShape iParams);
     void execute() override;
     void undo() override;
 };
+
+// class AddUniArrow : public Command
+// {
+// private:
+//     Shape *first;
+//     Shape *second;
+// public:
+//     AddUniArrow(ShapeStorage *iStorage, Shape *iFirst, Shape *iSecond);
+//     void execute() override;
+//     void undo() override;
+// };
 
 class ChangeShapeType: public Command
 {
@@ -103,7 +120,7 @@ private:
     QString newType;
 
 public:
-    ChangeShapeType(ShapeStorage &iStorage, FilterShape iParams, QString newTypeShape);
+    ChangeShapeType(ShapeStorage *iStorage, FilterShape iParams, QString newTypeShape);
     void execute() override;
     void undo() override;
 };

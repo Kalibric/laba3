@@ -19,6 +19,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->paintContainer, &PaintWidget::unGroupingButton, this, &MainWindow::unGroupingButton);
     connect(ui->paintContainer, &PaintWidget::deactivateButton, this, &MainWindow::deactivateGroupingButton);
     connect(ui->loadButton, &QAbstractButton::clicked, this, &MainWindow::loadButtonClick);
+
+    connect(ui->UniArrowButton, &QAbstractButton::clicked, ui->paintContainer, &PaintWidget::uniArrowButton);
+    connect(ui->BiArrowButton, &QAbstractButton::clicked, ui->paintContainer, &PaintWidget::biArrowButton);
+    connect(ui->paintContainer, &PaintWidget::arrowButtonEnable, this, &MainWindow::arrowButtonEnable);
+    connect(ui->paintContainer, &PaintWidget::arrowButtonDisable, this, &MainWindow::arrowButtonDisable);
 }
 MainWindow::~MainWindow()
 {
@@ -81,6 +86,19 @@ void MainWindow::updateShapeTypes()
 {
     for (QString name : ShapeFactory::getNames())
         ui->ShapeSelector->addItem(name);
+}
+
+void MainWindow::arrowButtonEnable()
+{
+    qDebug() << "a";
+    ui->UniArrowButton->setEnabled(true);
+    ui->BiArrowButton->setEnabled(true);
+}
+
+void MainWindow::arrowButtonDisable()
+{
+    ui->UniArrowButton->setEnabled(false);
+    ui->BiArrowButton->setEnabled(false);
 }
 
 // void MainWindow::setGroupingButton(std::string text)

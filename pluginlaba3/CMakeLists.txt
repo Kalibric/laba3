@@ -35,6 +35,10 @@ set(PROJECT_SOURCES
 qt_add_executable(pluginlaba3
     ${PROJECT_SOURCES}
     shapetree.h shapetree.cpp
+    uniarrow.h uniarrow.cpp
+    arrowstorage.h arrowstorage.cpp
+    arrow.h arrow.cpp
+    biarrow.h biarrow.cpp
 
 )
 # ----------------------------

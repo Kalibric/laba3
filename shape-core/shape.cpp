@@ -1,5 +1,6 @@
 #include "shape.h"
 int shapeID = 0;
+using namespace std;
 Shape::Shape()
 {
     id = shapeID++;
@@ -75,6 +76,8 @@ void Shape::moveRelative(int iX, int iY)
     {
         x += iX;
         y += iY;
+        for (callback callback : onMoved)
+            callback.func(iX, iY);
     }
 }
 
@@ -86,4 +89,21 @@ string Shape::type()
 void Shape::changeColor(QColor iColor)
 {
     color = iColor;
+}
+
+int Shape::addOnMoved(moveCallback func)
+{
+    int id = callbackIdCounter++;
+    onMoved.push_back({id, func});
+    return id;
+}
+
+void Shape::removeOnMoved(int id)
+{
+    onMoved.erase(
+        std::remove_if(onMoved.begin(), onMoved.end(),
+                       [id](callback& e) {
+                           return e.id == id;
+                       }),
+        onMoved.end());
 }

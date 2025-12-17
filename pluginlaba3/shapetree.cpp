@@ -23,6 +23,7 @@ void ShapeTree::storageUpdated()
     this->clear();
     vector<::Shape*> shapeList = storage->get(TypeShape::ALL);
     fillTree(nullptr, shapeList);
+    selectUpdated();
     this->expandAll();
 }
 

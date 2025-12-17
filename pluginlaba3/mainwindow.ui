@@ -81,6 +81,30 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="UniArrowButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Однонаправленная стрелка</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BiArrowButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Двунаправленная стрелка</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="PaintWidget" name="paintContainer" native="true">
@@ -103,11 +127,20 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="autoScroll">
+           <bool>true</bool>
+          </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
           </property>
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+          </property>
+          <property name="horizontalScrollMode">
+           <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
           </property>
           <property name="indentation">
            <number>10</number>

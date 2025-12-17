@@ -1,16 +1,21 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 #include <QPainter>
-#include <QDebug>
 #include <QPolygon>
 #include <vector>
 #include <QRegularExpression>
 #include "shape_global.h"
-
 using namespace std;
 class SHAPE_CORE_EXPORT Shape
 {
 public:
+    using moveCallback = function<void(int, int)>;
+    struct callback
+    {
+        int id;
+        moveCallback func;
+    };
+
     Shape();
     Shape(Shape &iShape);
     Shape(int iX, int iY, QColor iColor, int _id);
@@ -31,7 +36,7 @@ public:
     virtual void load(QTextStream &file, QString &text) = 0;
     virtual Shape* clone() = 0;
     virtual int getSize() = 0;
-    virtual string type();
+    virtual std::string type();
     int getX() { return x; }
     int getY() { return y; }
     QColor getColor() { return color; }
@@ -43,6 +48,8 @@ public:
     virtual bool isGroup() { return false; }
     virtual void add(Shape* child) {}
     virtual vector<Shape*> unGrouping() { return vector<Shape*>(); }
+    int addOnMoved(moveCallback func);
+    void removeOnMoved(int id);
 
 
 protected:
@@ -53,5 +60,7 @@ protected:
     int canvasSizeY;
     bool selected = false;
     QColor color = Qt::green;
+    vector<callback> onMoved;
+    int callbackIdCounter = 0;
 };
 #endif // SHAPE_H
