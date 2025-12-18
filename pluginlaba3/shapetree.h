@@ -20,7 +20,7 @@ public:
 
 private:
     vector<QTreeWidgetItem*> tree;
-    ShapeStorage *storage;
+    ShapeStorage *storage = nullptr;
     void fillTree(QTreeWidgetItem* parent, vector<::Shape*> shapes);
     QTreeWidgetItem* getFirstParent(QTreeWidgetItem* item);
     void setSelectChild(QTreeWidgetItem* item, bool status);

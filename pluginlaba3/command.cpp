@@ -5,10 +5,15 @@ Command::Command(ShapeStorage *iStorage) : storage(iStorage)
     id = idC++;
 }
 
-// Command::Command(ArrowStorage *iArrows) : arrows(iArrows)
-// {
-//     id = idC++;
-// }
+Command::Command(ArrowStorage *iArrows) : arrowStorage(iArrows)
+{
+    id = idC++;
+}
+
+Command::Command(ShapeStorage *iStorage, ArrowStorage *iArrows) : storage(iStorage), arrowStorage(iArrows)
+{
+    id = idC++;
+}
 
 AddShape::AddShape(ShapeStorage *iStorage, int x, int y, QColor color, QString type) : Command(iStorage)
 {
@@ -184,21 +189,27 @@ void ChangeShapeType::undo()
     storage->add(temp);
 }
 
-// AddUniArrow::AddUniArrow(ShapeStorage *iStorage, Shape *iFirst, Shape *iSecond) : Command(iStorage)
-// {
-//     first = iFirst->clone();
-//     second = iSecond->clone();
-// }
+AddUniArrow::AddUniArrow(ShapeStorage *iStorage, ArrowStorage *iArrowStorage, Shape *iFirst, Shape *iSecond) : Command(iStorage, iArrowStorage)
+{
+    qDebug() << "asdasd";
+    iFirst->clone();
+    // qDebug() << 6;
+    // first = iFirst->clone();
+    // qDebug() << 7;
+    // second = iSecond->clone();
+    // qDebug() << 8;
+}
 
-// void AddUniArrow::execute()
-// {
-//     arrows->addArrow(new UniArrow(first, second));
-// }
+void AddUniArrow::execute()
+{
+    // qDebug() << 5;
+    // idArrow = arrowStorage->add(new UniArrow(first, second));
+}
 
-// void AddUniArrow::undo()
-// {
-
-// }
+void AddUniArrow::undo()
+{
+    arrowStorage->remove(idArrow);
+}
 
 void CommandManager::clearStack(stack<Command*>& stack)
 {

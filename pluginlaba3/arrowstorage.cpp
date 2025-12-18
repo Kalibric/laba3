@@ -9,28 +9,34 @@ ArrowStorage::ArrowStorage(ShapeStorage *iStorage) : QObject(nullptr)
 ArrowStorage::~ArrowStorage()
 {
     disconnect();
-    for (Arrow *arrow : arrows)
-        delete arrow;
+    for (ArrowEntry *entry : arrows)
+    {
+        delete entry->arrow;
+        delete entry;
+    }
 }
 
-void ArrowStorage::addArrow(Arrow *iArrow)
+int ArrowStorage::add(Arrow *iArrow)
 {
-    arrows.push_back(iArrow);
+    int id = arrowID++;
+    arrows.push_back(new ArrowEntry{id, iArrow});
+    return id;
 }
 
 void ArrowStorage::draw(QPainter *painter)
 {
-    for (Arrow *arrow : arrows)
-        arrow->draw(painter);
+    for (ArrowEntry *entry : arrows)
+        entry->arrow->draw(painter);
 }
 
 void ArrowStorage::shapeDeletedBefore(Shape* shape)
 {
-    arrows.erase(std::remove_if(arrows.begin(), arrows.end(), [shape](Arrow* arrow)
+    arrows.erase(std::remove_if(arrows.begin(), arrows.end(), [shape](ArrowEntry* entry)
     {
-        if (arrow->shapeIs(shape))
+        if (entry->arrow->shapeIs(shape))
         {
-            delete arrow;
+            delete entry->arrow;
+            delete entry;
             return true;
         }
         return false;
@@ -39,8 +45,23 @@ void ArrowStorage::shapeDeletedBefore(Shape* shape)
 
 bool ArrowStorage::isExists(Shape *iA, Shape *iB)
 {
-    for (Arrow *arrow : arrows)
-        if (arrow->shapeIs(iA) && arrow->shapeIs(iB))
+    for (ArrowEntry *entry : arrows)
+        if (entry->arrow->shapeIs(iA) && entry->arrow->shapeIs(iB))
             return true;
     return false;
+}
+
+void ArrowStorage::remove(int id)
+{
+    arrows.erase(std::remove_if(arrows.begin(), arrows.end(),
+        [id](ArrowEntry* entry)
+        {
+            if (entry->id == id)
+            {
+                delete entry->arrow;
+                delete entry;
+                return true;
+            }
+            return false;
+        }), arrows.end());
 }

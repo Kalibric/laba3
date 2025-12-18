@@ -10,13 +10,20 @@ class ArrowStorage : public QObject
 public:
     ArrowStorage(ShapeStorage *iStorage);
     ~ArrowStorage();
-    void addArrow(Arrow *iArrow);
+    int add(Arrow *iArrow);
     void draw(QPainter *painter);
     bool isExists(Shape *iA, Shape *iB);
+    void remove(int id);
 
 private:
-    vector<Arrow*> arrows;
+    struct ArrowEntry
+    {
+        int id;
+        Arrow *arrow;
+    };
+    vector<ArrowEntry*> arrows;
     ShapeStorage *storage;
+    int arrowID = 0;
 
 private slots:
     void shapeDeletedBefore(Shape* shape);

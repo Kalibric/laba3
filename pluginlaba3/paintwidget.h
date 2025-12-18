@@ -58,8 +58,8 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    ShapeStorage *storage = new ShapeStorage();
-    ArrowStorage *arrowStorage = new ArrowStorage(storage);
+    ShapeStorage *storage = nullptr;
+    ArrowStorage *arrowStorage = nullptr;
     QPoint lastPosition;
     QPoint lastPositionBefore;
     bool isSelectEvent = false;
@@ -79,7 +79,7 @@ private:
     QAction* squareType;
     QAction* triangleType;
     CommandManager manager;
-    Shape *firstSelected;
+    Shape *firstSelected = nullptr;
     vector<Shape*> copyShapes;
     int resize = 0;
 

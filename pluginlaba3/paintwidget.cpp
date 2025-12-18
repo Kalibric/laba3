@@ -2,6 +2,8 @@
 using namespace std;
 PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 {
+    storage = new ShapeStorage();
+    arrowStorage = new ArrowStorage(storage);
     setMouseTracking(true);
     changeShapeType = new QMenu("Изменить фигуру", this);
     circleType = new QAction("Круг", this);
@@ -28,12 +30,11 @@ PaintWidget::PaintWidget(QWidget *parent) : QWidget(parent)
 
 void PaintWidget::paintEvent(QPaintEvent *event)
 {
-    QPainter *painter = new QPainter(this);
-    painter->setRenderHint(QPainter::Antialiasing);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
-    storage->draw(TypeShape::ALL, painter);
-    arrowStorage->draw(painter);
-    painter->end();
+    storage->draw(TypeShape::ALL, &painter);
+    arrowStorage->draw(&painter);
 }
 
 void PaintWidget::resizeEvent(QResizeEvent *event)
@@ -404,9 +405,12 @@ void PaintWidget::uniArrowButton()
     vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
     if (shapes.size() > 1)
     {
-        if (!arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
+        qDebug() << firstSelected;
+        if (firstSelected != nullptr && !arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
         {
-            arrowStorage->addArrow(new UniArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
+            manager.add(new AddUniArrow(storage, arrowStorage, firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
+            qDebug() << firstSelected->getID();
+            arrowStorage->add(new UniArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
             update();
         }
     }
@@ -417,9 +421,9 @@ void PaintWidget::biArrowButton()
     vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
     if (shapes.size() > 1)
     {
-        if (!arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
+        if (firstSelected != nullptr && !arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
         {
-            arrowStorage->addArrow(new BiArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
+            arrowStorage->add(new BiArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
             update();
         }
     }

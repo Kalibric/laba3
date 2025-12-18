@@ -2,20 +2,21 @@
 #define COMMAND_H
 #include <stack>
 #include "shapestorage.h"
-// #include "arrowstorage.h"
-// #include "uniarrow.h"
-// #include "biarrow.h"
+#include "arrowstorage.h"
+#include "uniarrow.h"
+#include "biarrow.h"
 using namespace std;
 class Command
 {
 protected:
     ShapeStorage* storage;
-    // ArrowStorage* arrows;
+    ArrowStorage* arrowStorage;
     int id;
 
 public:
     Command(ShapeStorage *iStorage);
-    // Command(ArrowStorage *iArrows);
+    Command(ArrowStorage *iArrows);
+    Command(ShapeStorage *iStorage, ArrowStorage *iArrows);
     virtual void execute() = 0;
     virtual void undo() = 0;
 };
@@ -123,6 +124,18 @@ public:
     ChangeShapeType(ShapeStorage *iStorage, FilterShape iParams, QString newTypeShape);
     void execute() override;
     void undo() override;
+};
+
+class AddUniArrow : public Command
+{
+private:
+    Shape *first;
+    Shape *second;
+    int idArrow;
+public:
+    AddUniArrow(ShapeStorage *iStorage, ArrowStorage *iArrowStorage, Shape *iFirst, Shape *iSecond);
+    void execute();
+    void undo();
 };
 
 class CommandManager
