@@ -128,3 +128,17 @@ string Circle::type()
 {
     return "Circle";
 }
+
+void Circle::setSize(int size)
+{
+    radius = size;
+    if (radius + size < 5)
+        radius = 5;
+    else if (radius + size > 150)
+        radius = 150;
+    else
+        radius += size;
+
+    if (!validateCoord(x, y))
+        correctionCoord();
+}

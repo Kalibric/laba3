@@ -107,3 +107,15 @@ void Shape::removeOnMoved(int id)
                        }),
         onMoved.end());
 }
+
+void Shape::setX(int iX)
+{
+    x = iX;
+    correctionCoord();
+}
+
+void Shape::setY(int iY)
+{
+    y = iY;
+    correctionCoord();
+}

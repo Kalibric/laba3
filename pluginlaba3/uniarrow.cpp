@@ -48,7 +48,12 @@ void UniArrow::draw(QPainter *painter)
 
 void UniArrow::updateA(int x, int y)
 {
-    B->moveRelative(x, y);
+    if (!move)
+    {
+        move = true;
+        B->moveRelative(x, y);
+        move = false;
+    }
 }
 
 void UniArrow::updateB(int x, int y)

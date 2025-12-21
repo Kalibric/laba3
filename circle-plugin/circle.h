@@ -5,6 +5,8 @@
 
 class Circle: public Shape
 {
+    Q_OBJECT
+    Q_PROPERTY(int size READ getSize WRITE setSize)
 public:
     Circle();
     Circle(Circle &iCircle);
@@ -21,6 +23,7 @@ public:
     Circle* clone() override;
     int getSize() override;
     string type() override;
+    void setSize(int size) override;
 
 protected:
     int radius = 50;

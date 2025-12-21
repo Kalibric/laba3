@@ -159,6 +159,14 @@ int GroupShape::getSize()
     return lx < ly ? lx : ly;
 }
 
+void GroupShape::setSize(int size)
+{
+    for (Shape* shape : storage)
+    {
+        shape->setSize(size);
+    }
+}
+
 vector<Shape*> GroupShape::unGrouping()
 {
     vector<Shape*> result;

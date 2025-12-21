@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->paintContainer->setStorage(storage);
     ui->ShapeTreeView->setStorage(storage);
+    ui->propertyContainer->setStorage(storage);
 
     connect(ui->ShapeSelector, &QComboBox::currentIndexChanged, this, &MainWindow::shapeSelector);
     connect(ui->ColorSelector, &QAbstractButton::clicked, this, &MainWindow::colorSelector);
@@ -90,7 +91,6 @@ void MainWindow::updateShapeTypes()
 
 void MainWindow::arrowButtonEnable()
 {
-    qDebug() << "a";
     ui->UniArrowButton->setEnabled(true);
     ui->BiArrowButton->setEnabled(true);
 }

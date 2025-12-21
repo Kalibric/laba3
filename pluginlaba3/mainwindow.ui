@@ -120,57 +120,97 @@
          </widget>
         </item>
         <item>
-         <widget class="ShapeTree" name="ShapeTreeView">
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
+          <property name="sizeConstraint">
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
-          </property>
-          <property name="autoScroll">
-           <bool>true</bool>
-          </property>
-          <property name="selectionMode">
-           <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
-          </property>
-          <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-          </property>
-          <property name="horizontalScrollMode">
-           <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
-          </property>
-          <property name="indentation">
-           <number>10</number>
-          </property>
-          <property name="itemsExpandable">
-           <bool>true</bool>
-          </property>
-          <property name="headerHidden">
-           <bool>true</bool>
-          </property>
-          <property name="expandsOnDoubleClick">
-           <bool>false</bool>
-          </property>
-          <property name="columnCount">
-           <number>2</number>
-          </property>
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string notr="true">1</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">2</string>
-           </property>
-          </column>
-         </widget>
+          <item>
+           <widget class="ShapeTree" name="ShapeTreeView">
+            <property name="minimumSize">
+             <size>
+              <width>220</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>220</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+            </property>
+            <property name="autoScroll">
+             <bool>true</bool>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+            </property>
+            <property name="horizontalScrollMode">
+             <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+            </property>
+            <property name="indentation">
+             <number>10</number>
+            </property>
+            <property name="itemsExpandable">
+             <bool>true</bool>
+            </property>
+            <property name="headerHidden">
+             <bool>true</bool>
+            </property>
+            <property name="expandsOnDoubleClick">
+             <bool>false</bool>
+            </property>
+            <property name="columnCount">
+             <number>2</number>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string notr="true">2</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="PropertyWindow" name="propertyContainer">
+            <property name="minimumSize">
+             <size>
+              <width>220</width>
+              <height>200</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>220</width>
+              <height>16777213</height>
+             </size>
+            </property>
+            <property name="columnCount">
+             <number>2</number>
+            </property>
+            <attribute name="horizontalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <column/>
+            <column/>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -201,6 +241,11 @@
    <class>ShapeTree</class>
    <extends>QTreeWidget</extends>
    <header>shapetree.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PropertyWindow</class>
+   <extends>QTableWidget</extends>
+   <header>propertywindow.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

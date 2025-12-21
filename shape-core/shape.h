@@ -6,8 +6,16 @@
 #include <QRegularExpression>
 #include "shape_global.h"
 using namespace std;
-class SHAPE_CORE_EXPORT Shape
+class SHAPE_CORE_EXPORT Shape : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(int x READ getX WRITE setX)
+    Q_PROPERTY(int y READ getY WRITE setY)
+    Q_PROPERTY(int canvasSizeX READ getCanvasSizeX)
+    Q_PROPERTY(int canvasSizeY READ getCanvasSizeY)
+    Q_PROPERTY(int id READ getID)
+    Q_PROPERTY(bool selected READ isSelect)
+    Q_PROPERTY(QColor color READ getColor WRITE changeColor)
 public:
     using moveCallback = function<void(int, int)>;
     struct callback
@@ -37,12 +45,15 @@ public:
     virtual Shape* clone() = 0;
     virtual int getSize() = 0;
     virtual std::string type();
+    virtual void setSize(int size) = 0;
     int getX() { return x; }
     int getY() { return y; }
     QColor getColor() { return color; }
     int getID() { return id; }
     int getCanvasSizeX() { return canvasSizeX; }
     int getCanvasSizeY() { return canvasSizeY; }
+    void setX(int iX);
+    void setY(int iY);
 
     // Composite
     virtual bool isGroup() { return false; }

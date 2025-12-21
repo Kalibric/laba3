@@ -265,12 +265,17 @@ void PaintWidget::validateGroupingButton()
 
 void PaintWidget::setStorage(ShapeStorage *iStorage)
 {
-    disconnect(storage, &ShapeStorage::selectUpdated, this, &PaintWidget::selectUpdated);
+    if (storage != nullptr)
+    {
+        disconnect(storage, &ShapeStorage::selectUpdated, this, &PaintWidget::selectUpdated);
+        disconnect(storage, &ShapeStorage::storageUpdated, this, &PaintWidget::storageUpdated);
+    }
     delete arrowStorage;
     delete storage;
     storage = iStorage;
     arrowStorage = new ArrowStorage(storage);
     connect(storage, &ShapeStorage::selectUpdated, this, &PaintWidget::selectUpdated);
+    connect(storage, &ShapeStorage::storageUpdated, this, &PaintWidget::storageUpdated);
 }
 
 void PaintWidget::changeSelectedShape(QString iSelectedShape)
@@ -405,11 +410,9 @@ void PaintWidget::uniArrowButton()
     vector<Shape*> shapes = storage->get(TypeShape::SELECTED);
     if (shapes.size() > 1)
     {
-        qDebug() << firstSelected;
         if (firstSelected != nullptr && !arrowStorage->isExists(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]))
         {
             manager.add(new AddUniArrow(storage, arrowStorage, firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
-            qDebug() << firstSelected->getID();
             arrowStorage->add(new UniArrow(firstSelected, shapes[0] == firstSelected ? shapes[1] : shapes[0]));
             update();
         }
@@ -427,4 +430,9 @@ void PaintWidget::biArrowButton()
             update();
         }
     }
+}
+
+void PaintWidget::storageUpdated()
+{
+    update();
 }

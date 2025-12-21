@@ -217,13 +217,21 @@ void ShapeStorage::moveRelative(FilterShape params, int x, int y)
     vector<Shape*> result = get(params);
     for (Shape* shape : result)
         shape->moveRelative(x, y);
+    if (!result.empty())
+        emit storageUpdated();
 }
 
 void ShapeStorage::moveRelative(Shape* shape, int x, int y)
 {
+    bool success = false;
     for (size_t i = 0; i < storage.size(); i++)
         if (storage[i]->getID() == shape->getID())
+        {
+            success = true;
             storage[i]->moveRelative(x, y);
+        }
+    if (success)
+        emit storageUpdated();
 }
 
 void ShapeStorage::resizeRelative(FilterShape params, int iSize)
@@ -369,4 +377,17 @@ void ShapeStorage::load(QString iFile)
             storage.push_back(shape);
         }
     }
+}
+
+void ShapeStorage::setProperty(FilterShape params, const char *key, QVariant value)
+{
+    bool success = false;
+    vector<Shape*> shapes = get(params);
+    for (Shape *shape : shapes)
+    {
+        success = true;
+        shape->setProperty(key, value);
+    }
+    if (success)
+        emit storageUpdated();
 }

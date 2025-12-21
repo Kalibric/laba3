@@ -99,6 +99,8 @@ private slots:
     void selectAllAction();
     void selectUpdated();
 
+    void storageUpdated();
+
 };
 
 #endif // PAINTWIDGET_H

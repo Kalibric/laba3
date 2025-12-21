@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(shape-core LANGUAGES CXX)
-
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 # Ищем необходимые модули Qt6
 find_package(Qt6 REQUIRED COMPONENTS Core Gui)
 

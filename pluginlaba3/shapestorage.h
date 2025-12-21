@@ -66,6 +66,7 @@ public:
     int count(FilterShape params);
     void changeShapeType(Shape* shape, QString newType);
     void changeShapeType(vector<Shape*> shapes, QString newType);
+    void setProperty(FilterShape params, const char *key, QVariant value);
 
     void saveInFile(QString iFile);
     void load(QString iFile);

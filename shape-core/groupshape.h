@@ -8,7 +8,7 @@
 
 class SHAPE_CORE_EXPORT GroupShape : public Shape
 {
-
+    Q_PROPERTY(int size READ getSize WRITE setSize)
 public:
     GroupShape();
     GroupShape(GroupShape &iGroup);
@@ -32,6 +32,7 @@ public:
     void changeTypeTo(QString newType);
     void load(QTextStream &file, QString &line) override;
     std::string type() override;
+    void setSize(int size) override;
     virtual int getSizeX();
     virtual int getSizeY();
 

@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Gui Core)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 # ----------------------------
 # ��������� �������
@@ -39,6 +40,7 @@ qt_add_executable(pluginlaba3
     arrowstorage.h arrowstorage.cpp
     arrow.h arrow.cpp
     biarrow.h biarrow.cpp
+    propertywindow.h propertywindow.cpp
 
 )
 # ----------------------------
@@ -65,6 +67,7 @@ target_link_libraries(pluginlaba3 PRIVATE
     Qt6::Widgets
     "${SHAPE_CORE_LIB_DIR}/libshape-core.dll.a"  # �������� � DLL ��������� �����������
 )
+target_link_libraries(pluginlaba3 PRIVATE Qt6::Widgets)
 target_link_libraries(pluginlaba3 PRIVATE Qt6::Widgets)
 
 # ----------------------------

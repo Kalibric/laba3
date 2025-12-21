@@ -13,6 +13,9 @@ public:
     void draw(QPainter *painter) override;
     void updateA(int x, int y) override;
     void updateB(int x, int y) override;
+
+private:
+    bool move = false;
 };
 
 #endif // UNIARROW_H
